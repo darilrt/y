@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 
 class NavBar extends StatefulWidget {
-  const NavBar({Key? key}) : super(key: key);
+  const NavBar({Key? key, required this.icons, required this.onChange})
+      : super(key: key);
+
+  final List<IconData> icons;
+
+  final void Function(int) onChange;
 
   @override
   State<NavBar> createState() => _NavBarState();
@@ -10,18 +15,12 @@ class NavBar extends StatefulWidget {
 class _NavBarState extends State<NavBar> {
   int _selectedIndex = 0;
 
-  final List<IconData> icons = const [
-    Icons.home,
-    Icons.search,
-    Icons.add,
-    Icons.favorite,
-    Icons.person,
-  ];
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+
+    widget.onChange(index);
   }
 
   @override
@@ -31,13 +30,13 @@ class _NavBarState extends State<NavBar> {
         padding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: List.generate(5, (i) {
+          children: List.generate(widget.icons.length, (i) {
             return IconButton(
               icon: Icon(
-                icons[i],
+                widget.icons[i],
                 color: _selectedIndex == i
-                    ? Theme.of(context).colorScheme.secondary
-                    : Theme.of(context).colorScheme.onPrimary,
+                    ? Theme.of(context).colorScheme.onPrimary
+                    : Theme.of(context).colorScheme.onSecondary,
                 size: 24,
               ),
               onPressed: () => _onItemTapped(i),
