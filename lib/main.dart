@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'pages/home_page.dart';
+import 'main/pages/home_page.dart';
+import 'main/pages/login_page.dart';
+import 'main/pages/register_page.dart';
 import 'themes.dart';
 
 void main() {
@@ -15,7 +17,12 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Project Y',
       theme: YThemes.dark(),
-      home: const HomePage(title: 'Y'),
+      initialRoute: "/login",
+      routes: {
+        "/home": (context) => const HomePage(),
+        "/login": (context) => const LoginPage(),
+        "/register": (context) => const RegisterPage(),
+      },
     );
   }
 }

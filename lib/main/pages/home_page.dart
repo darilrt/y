@@ -1,35 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:y/messaging/pages/chats.dart';
 import '../widgets/navbar.dart';
 import 'profile_page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedTab = 0;
+  int _selectedTab = 2;
 
-  List<IconData> icons = [
-    Icons.home,
-    Icons.search,
-    Icons.add,
+  final List<IconData> icons = [
     Icons.person,
+    // Icons.search,
+    Icons.apps,
+    // Icons.notificatiwwons,
+    Icons.message,
   ];
 
   Widget _buildBody() {
-    switch (_selectedTab) {
-      case 0:
-        return const Text("Home"); // TODO: Implement home page
+    switch (icons[_selectedTab]) {
+      case Icons.message:
+        return const ChatsPage();
 
-      case 1:
+      case Icons.search:
         return const Text("Search"); // TODO: Implement search page
 
-      case 2:
+      case Icons.apps:
+        return const Text("Apps"); // TODO: Implement apps page
+
+      case Icons.notifications:
+        return const Text(
+            "Notifications"); // TODO: Implement notifications page
+
+      case Icons.person:
         return const ProfilePage();
 
       default:
