@@ -1,25 +1,3 @@
-/*
-{
-  "uid": "wddRtS7RSXg5QFAKwPFUCRgq84Y2",
-  "email": "demo1@gmail.com",
-  "emailVerified": false,
-  "disabled": false,
-  "metadata": {
-      "lastSignInTime": null,
-      "creationTime": "Sun, 16 Jul 2023 20:30:03 GMT",
-      "lastRefreshTime": null
-  },
-  "tokensValidAfterTime": "Sun, 16 Jul 2023 20:30:03 GMT",
-  "providerData": [
-      {
-          "uid": "demo1@gmail.com",
-          "email": "demo1@gmail.com",
-          "providerId": "password"
-      }
-  ]
-}
- */
-
 class User {
   final String uid;
   final String name;
