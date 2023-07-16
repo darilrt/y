@@ -3,45 +3,49 @@ import 'package:y/main/models/user.dart';
 import 'package:y/main/repo/user_repo.dart';
 import 'package:y/messaging/models/chat.dart';
 import 'package:y/messaging/models/message.dart';
+import 'package:y/messaging/repo/message_repo.dart';
 import 'package:y/messaging/widgets/chat_message.dart';
 
 import '../widgets/chat_app_bar.dart';
 
-class ChatPage extends StatelessWidget {
+class ChatPage extends StatefulWidget {
   const ChatPage({Key? key, required this.info}) : super(key: key);
 
   final ChatInfo info;
 
   @override
+  State<ChatPage> createState() => _ChatPageState();
+}
+
+class _ChatPageState extends State<ChatPage> {
+  List<Message> messages = [];
+
+  final TextEditingController _messageController = TextEditingController();
+
+  void _onSendMessage() {
+    if (_messageController.text.isEmpty) {
+      return;
+    }
+
+    MessageRepo.sendMessage(
+      chatId: widget.info.id,
+      message: _messageController.text,
+    );
+
+    setState(() {
+      _messageController.clear();
+      messages = MessageRepo.dataMessage;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    messages = MessageRepo.dataMessage;
+
     String backgroundImage =
         'https://papers.co/wallpaper/papers.co-vy45-digital-dark-square-color-bw-pattern-background-41-iphone-wallpaper.jpg';
 
     User me = UserRepo.currentUser!;
-
-    List<Message> messages = [
-      Message(
-        id: '3',
-        chatId: '1',
-        senderId: '1234567890',
-        message: 'You are a bold one!',
-        createdAt: DateTime.now(),
-      ),
-      Message(
-        id: '2',
-        chatId: '1',
-        senderId: '2',
-        message: 'General Kenobi!',
-        createdAt: DateTime.now(),
-      ),
-      Message(
-        id: '1',
-        chatId: '1',
-        senderId: '1234567890',
-        message: 'Hello, There!',
-        createdAt: DateTime.now(),
-      ),
-    ];
 
     return Scaffold(
       body: Container(
@@ -64,11 +68,19 @@ class ChatPage extends StatelessWidget {
                 Expanded(
                   child: ListView.builder(
                     reverse: true,
-                    itemCount: messages.length,
-                    itemBuilder: (context, index) => ChatMessage(
-                      message: messages[index].message,
-                      isMe: messages[index].senderId == me.uid,
-                    ),
+                    itemCount: messages.length + 1,
+                    itemBuilder: (context, index) {
+                      if (index == messages.length) {
+                        return const SizedBox(
+                          height: 100,
+                        );
+                      } else {
+                        return ChatMessage(
+                          message: messages[index].message,
+                          isMe: messages[index].senderId == me.uid,
+                        );
+                      }
+                    },
                   ),
                 ),
                 Container(
@@ -89,10 +101,11 @@ class ChatPage extends StatelessWidget {
                             filled: true,
                             fillColor: Theme.of(context).colorScheme.primary,
                           ),
+                          controller: _messageController,
                         ),
                       ),
                       IconButton(
-                        onPressed: () {},
+                        onPressed: _onSendMessage,
                         icon: const Icon(Icons.send_rounded),
                       ),
                       const SizedBox(
@@ -104,8 +117,8 @@ class ChatPage extends StatelessWidget {
               ],
             ),
             ChatAppBar(
-              name: info.name,
-              avatar: info.avatar,
+              name: widget.info.name,
+              avatar: widget.info.avatar,
             ),
           ],
         ),

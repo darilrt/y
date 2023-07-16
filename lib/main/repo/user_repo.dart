@@ -31,8 +31,14 @@ class UserRepo {
       uid: '1234567890',
       name: 'John Doe',
       username: username,
-      email: 'johndoe@example.com',
       avatar: 'https://i.pravatar.cc/240',
+      email: 'johndoe@example.com',
+      emailVerified: false,
+      disabled: false,
+      lastSignInTime: DateTime.now(),
+      creationTime: DateTime.now(),
+      lastRefreshTime: DateTime.now(),
+      tokensValidAfterTime: DateTime.now(),
     );
 
     return _currentUser;
