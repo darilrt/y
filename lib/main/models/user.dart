@@ -10,6 +10,7 @@ class User {
   final DateTime creationTime;
   final DateTime lastRefreshTime;
   final DateTime tokensValidAfterTime;
+  final List<String> chats;
 
   User({
     required this.uid,
@@ -23,22 +24,26 @@ class User {
     required this.creationTime,
     required this.lastRefreshTime,
     required this.tokensValidAfterTime,
+    required this.chats,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       uid: json['uid'],
       name: json['name'],
-      email: json['email'],
-      emailVerified: json['emailVerified'],
+      email: json['email'] ?? '',
+      emailVerified: json['emailVerified'] ?? false,
       username: json['username'],
-      avatar: json['avatar'],
-      disabled: json['disabled'],
-      lastSignInTime: DateTime.parse(json['metadata']['lastSignInTime']),
-      creationTime: DateTime.parse(json['metadata']['creationTime']),
-      lastRefreshTime: DateTime.parse(json['metadata']['lastRefreshTime']),
-      tokensValidAfterTime:
-          DateTime.parse(json['tokensValidAfterTime'].toString()),
+      avatar: json['avatar'] ??
+          'https://firebasestorage.googleapis.com/v0/b/daril-y.appspot.com/o/profiles%2Fdefault.jpg?alt=media&token=4e23040e-5e3f-4972-bd34-5d23acc02f27',
+      disabled: json['disabled'] ?? false,
+      chats: json['chats'] != null
+          ? List<String>.from(json['chats'] as List)
+          : <String>[],
+      lastSignInTime: DateTime.now(),
+      creationTime: DateTime.now(),
+      lastRefreshTime: DateTime.now(),
+      tokensValidAfterTime: DateTime.now(), // TODO: Parse from json
     );
   }
 

@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "206359178622",
+    "firebase_url": "https://daril-y-default-rtdb.firebaseio.com",
+    "project_id": "daril-y",
+    "storage_bucket": "daril-y.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:206359178622:android:066bb25a54c184bc2a572f",
+        "android_client_info": {
+          "package_name": "com.example.y"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "206359178622-uq9ac27r4nu7g9biei0b2udf6hnuaam8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDcmaft2cxQmPPKyvQRhtSEfF28yJH7ICo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "206359178622-uq9ac27r4nu7g9biei0b2udf6hnuaam8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:206359178622:android:f055aded1ef28beb2a572f",
+        "android_client_info": {
+          "package_name": "com.y.y"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "206359178622-uq9ac27r4nu7g9biei0b2udf6hnuaam8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDcmaft2cxQmPPKyvQRhtSEfF28yJH7ICo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "206359178622-uq9ac27r4nu7g9biei0b2udf6hnuaam8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

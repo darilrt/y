@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:y/main/models/user.dart';
+import 'package:y/main/repo/user_repo.dart';
 import 'package:y/messaging/pages/chat.dart';
 import 'package:y/utils/route.dart';
 
@@ -11,101 +13,13 @@ class ChatItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String messageWrapped = info.lastMessage.length > 30
-        ? info.lastMessage.substring(0, 25)
-        : info.lastMessage;
-
-    if (info.lastMessage.length > 30) messageWrapped += '...';
-
     return ListTile(
       onTap: () {
         Navigator.of(context).push(YPageRoute(
           page: ChatPage(info: info),
         ));
       },
-      title: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Transform.translate(
-            offset: const Offset(0, -4),
-            child: CircleAvatar(
-              radius: 25,
-              backgroundImage: NetworkImage(info.avatar),
-            ),
-          ),
-          info.isOnline
-              ? Transform.translate(
-                  offset: const Offset(-13, 13),
-                  child: const Icon(
-                    Icons.circle,
-                    size: 15,
-                    color: Colors.green,
-                  ),
-                )
-              : const SizedBox(
-                  width: 15,
-                ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              const SizedBox(
-                height: 9,
-              ),
-              Text(
-                info.name,
-                style: const TextStyle(
-                  fontSize: 20,
-                ),
-              ),
-              const SizedBox(
-                height: 5,
-              ),
-              Text(
-                messageWrapped,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-          const Spacer(),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                lastMessageTime(info.lastMessageTime),
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
-              ),
-              const SizedBox(
-                height: 5,
-              ),
-              info.messagesCount > 0
-                  ? Container(
-                      padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                      decoration: BoxDecoration(
-                        color: Colors.blue,
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      child: Text(
-                        info.messagesCount.toString(),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                        ),
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-            ],
-          ),
-        ],
-      ),
+      title: info.isGroup ? buildGroupChat(context) : buildUserChat(context),
     );
   }
 
@@ -122,5 +36,116 @@ class ChatItem extends StatelessWidget {
     } else {
       return '${difference.inSeconds}s';
     }
+  }
+
+  buildGroupChat(BuildContext context) {
+    return Text(
+      info.name,
+      style: const TextStyle(
+        fontSize: 20,
+      ),
+    );
+  }
+
+  buildUserChat(BuildContext context) {
+    String messageWrapped = info.lastMessage.length > 30
+        ? info.lastMessage.substring(0, 25)
+        : info.lastMessage;
+
+    if (info.lastMessage.length > 30) messageWrapped += '...';
+
+    final otherUserId = info.users
+        .firstWhere((element) => element != UserRepo.currentUser!.uid);
+
+    return StreamBuilder<User?>(
+        stream: UserRepo.getUserStream(otherUserId),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const SizedBox.shrink();
+          }
+
+          User otherUser = snapshot.data!;
+
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Transform.translate(
+                offset: const Offset(0, 0),
+                child: CircleAvatar(
+                  radius: 25,
+                  backgroundImage: NetworkImage(otherUser.avatar),
+                ),
+              ),
+              info.isOnline
+                  ? Transform.translate(
+                      offset: const Offset(-13, 13),
+                      child: const Icon(
+                        Icons.circle,
+                        size: 15,
+                        color: Colors.green,
+                      ),
+                    )
+                  : const SizedBox(
+                      width: 15,
+                    ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    otherUser.name,
+                    style: const TextStyle(
+                      fontSize: 20,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                    messageWrapped,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+              const Spacer(),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    lastMessageTime(info.lastMessageTime),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  info.messagesCount > 0
+                      ? Container(
+                          padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                          decoration: BoxDecoration(
+                            color: Colors.blue,
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          child: Text(
+                            info.messagesCount.toString(),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                ],
+              ),
+            ],
+          );
+        });
   }
 }

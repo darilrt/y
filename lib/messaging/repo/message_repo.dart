@@ -1,7 +1,7 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:y/main/models/user.dart';
 import 'package:y/main/repo/user_repo.dart';
-
-import '../models/message.dart';
+import 'package:y/messaging/models/message.dart';
 
 class MessageRepo {
   static void sendMessage({
@@ -10,42 +10,27 @@ class MessageRepo {
   }) {
     User me = UserRepo.currentUser!;
 
-    Message newMessage = Message(
-      id: _messageIndex.toString(),
-      chatId: chatId,
-      senderId: me.uid,
-      message: message,
-      createdAt: DateTime.now(),
-    );
+    final DatabaseReference messagesRef =
+        FirebaseDatabase.instance.ref('chats/$chatId/messages');
 
-    dataMessage.insert(0, newMessage);
-    _messageIndex++;
+    messagesRef.push().set({
+      'message': message,
+      'senderId': me.uid,
+      'createdAt': DateTime.now().millisecondsSinceEpoch,
+    });
   }
 
-  // Data for testing
-  static List<Message> dataMessage = [
-    Message(
-      id: '3',
-      chatId: '1',
-      senderId: '1234567890',
-      message: 'You are a bold one!',
-      createdAt: DateTime.now(),
-    ),
-    Message(
-      id: '2',
-      chatId: '1',
-      senderId: '2',
-      createdAt: DateTime.now(),
-      message: 'General Kenobi!',
-    ),
-    Message(
-      id: '1',
-      message: 'Hello, There!',
-      senderId: '1234567890',
-      chatId: '1',
-      createdAt: DateTime.now(),
-    ),
-  ];
+  static Stream<List<Message>> getMessagesStream(String id) {
+    return FirebaseDatabase.instance.ref('chats/$id/messages').onValue.map(
+      (event) {
+        List<Message> messages = <Message>[];
 
-  static int _messageIndex = 3;
+        if (event.snapshot.exists) {
+          messages = Message.fromJsonList(event.snapshot.value as Map);
+        }
+
+        return messages;
+      },
+    );
+  }
 }

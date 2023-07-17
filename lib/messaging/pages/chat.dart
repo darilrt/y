@@ -6,6 +6,7 @@ import 'package:y/messaging/models/message.dart';
 import 'package:y/messaging/repo/message_repo.dart';
 import 'package:y/messaging/widgets/chat_message.dart';
 
+import '../repo/chat_repo.dart';
 import '../widgets/chat_app_bar.dart';
 
 class ChatPage extends StatefulWidget {
@@ -18,8 +19,6 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  List<Message> messages = [];
-
   final TextEditingController _messageController = TextEditingController();
 
   void _onSendMessage() {
@@ -34,14 +33,11 @@ class _ChatPageState extends State<ChatPage> {
 
     setState(() {
       _messageController.clear();
-      messages = MessageRepo.dataMessage;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    messages = MessageRepo.dataMessage;
-
     String backgroundImage =
         'https://papers.co/wallpaper/papers.co-vy45-digital-dark-square-color-bw-pattern-background-41-iphone-wallpaper.jpg';
 
@@ -66,18 +62,35 @@ class _ChatPageState extends State<ChatPage> {
             Column(
               children: [
                 Expanded(
-                  child: ListView.builder(
-                    reverse: true,
-                    itemCount: messages.length + 1,
-                    itemBuilder: (context, index) {
-                      if (index == messages.length) {
-                        return const SizedBox(
-                          height: 100,
+                  child: StreamBuilder<List<Message?>>(
+                    stream: MessageRepo.getMessagesStream(widget.info.id),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        List<Message?> messages = snapshot.data ?? <Message?>[];
+
+                        return ListView.builder(
+                          reverse: true,
+                          itemCount: messages.length + 1,
+                          itemBuilder: (context, index) {
+                            if (index == messages.length) {
+                              return const SizedBox(
+                                height: 200,
+                              );
+                            }
+
+                            Message? message = messages[index];
+
+                            return message != null
+                                ? ChatMessage(
+                                    message: message.message,
+                                    isMe: message.senderId == me.uid,
+                                  )
+                                : const SizedBox();
+                          },
                         );
                       } else {
-                        return ChatMessage(
-                          message: messages[index].message,
-                          isMe: messages[index].senderId == me.uid,
+                        return const Center(
+                          child: CircularProgressIndicator(),
                         );
                       }
                     },
@@ -92,6 +105,8 @@ class _ChatPageState extends State<ChatPage> {
                     children: [
                       Expanded(
                         child: TextField(
+                          keyboardType: TextInputType.text,
+                          textCapitalization: TextCapitalization.sentences,
                           decoration: InputDecoration(
                             hintText: 'Type a message',
                             border: OutlineInputBorder(
@@ -116,9 +131,46 @@ class _ChatPageState extends State<ChatPage> {
                 ),
               ],
             ),
-            ChatAppBar(
-              name: widget.info.name,
-              avatar: widget.info.avatar,
+            StreamBuilder<ChatInfo?>(
+              stream: ChatRepo.getChatInfoStream(widget.info.id),
+              builder: (context, snapshot) {
+                if (snapshot.hasData && snapshot.data != null) {
+                  ChatInfo info = snapshot.data!;
+
+                  if (info.isGroup) {
+                    return ChatAppBar(
+                      name: info.name,
+                      avatar: info.avatar,
+                    );
+                  }
+
+                  return StreamBuilder<User?>(
+                    stream: UserRepo.getUserStream(info.users.first),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData && snapshot.data != null) {
+                        User user = snapshot.data!;
+
+                        return ChatAppBar(
+                          name: user.name,
+                          avatar: user.avatar,
+                        );
+                      } else {
+                        return const ChatAppBar(
+                          name: '',
+                          avatar:
+                              'https://firebasestorage.googleapis.com/v0/b/daril-y.appspot.com/o/profiles%2Fdefault.jpg?alt=media&token=4e23040e-5e3f-4972-bd34-5d23acc02f27',
+                        );
+                      }
+                    },
+                  );
+                } else {
+                  return const ChatAppBar(
+                    name: '',
+                    avatar:
+                        'https://firebasestorage.googleapis.com/v0/b/daril-y.appspot.com/o/profiles%2Fdefault.jpg?alt=media&token=4e23040e-5e3f-4972-bd34-5d23acc02f27',
+                  );
+                }
+              },
             ),
           ],
         ),

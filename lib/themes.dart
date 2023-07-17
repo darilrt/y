@@ -20,6 +20,9 @@ class YThemes {
             minimumSize: const Size(150, 40),
           ),
         ),
+        progressIndicatorTheme: const ProgressIndicatorThemeData(
+          color: Colors.white,
+        ),
         textSelectionTheme: const TextSelectionThemeData(
           cursorColor: Colors.white,
           selectionColor: Colors.white,

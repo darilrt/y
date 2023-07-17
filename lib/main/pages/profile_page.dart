@@ -25,9 +25,11 @@ class ProfilePage extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.of(context).push(YPageRoute(
-                page: const SettingsPage(),
-              ));
+              Navigator.of(context).push(
+                YPageRoute(
+                  page: const SettingsPage(),
+                ),
+              );
             },
             icon: const Icon(Icons.more_vert_rounded),
           ),
@@ -37,10 +39,18 @@ class ProfilePage extends StatelessWidget {
         ],
       ),
       body: Container(
-        height: 125,
-        padding: const EdgeInsets.fromLTRB(30, 0, 20, 20),
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: NetworkImage(
+              'https://papers.co/wallpaper/papers.co-vy45-digital-dark-square-color-bw-pattern-background-41-iphone-wallpaper.jpg',
+            ),
+            fit: BoxFit.cover,
+          ),
+        ),
+        height: 130,
+        padding: const EdgeInsets.fromLTRB(20, 25, 20, 15),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CircleAvatar(
               radius: 40,
@@ -53,7 +63,7 @@ class ProfilePage extends StatelessWidget {
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Text(
                   user.name,
@@ -67,9 +77,6 @@ class ProfilePage extends StatelessWidget {
                     fontSize: 16,
                     color: Colors.white30,
                   ),
-                ),
-                const SizedBox(
-                  height: 5,
                 ),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,

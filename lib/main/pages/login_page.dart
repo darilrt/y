@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:y/main/repo/user_repo.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+class LoginPage extends StatelessWidget {
+  LoginPage({Key? key}) : super(key: key);
 
-  @override
-  State<LoginPage> createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
-  String username = '';
-  String password = '';
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
 
   void _onLogin(BuildContext context) {
-    UserRepo.login(username, password).then((value) {
+    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fill all fields'),
+        ),
+      );
+      return;
+    }
+
+    UserRepo.login(emailController.text, passwordController.text).then((value) {
       if (value != null) {
         Navigator.pushReplacementNamed(context, '/home');
       } else {
@@ -23,6 +27,12 @@ class _LoginPageState extends State<LoginPage> {
           ),
         );
       }
+    }).catchError((error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error.message),
+        ),
+      );
     });
   }
 
@@ -50,11 +60,9 @@ class _LoginPageState extends State<LoginPage> {
               ),
               TextField(
                 decoration: const InputDecoration(
-                  hintText: 'Username',
+                  hintText: 'Email',
                 ),
-                onChanged: (value) {
-                  username = value;
-                },
+                controller: emailController,
               ),
               const SizedBox(
                 height: 20,
@@ -66,9 +74,7 @@ class _LoginPageState extends State<LoginPage> {
                 obscureText: true,
                 enableSuggestions: false,
                 autocorrect: false,
-                onChanged: (value) {
-                  password = value;
-                },
+                controller: passwordController,
               ),
               const SizedBox(
                 height: 50,

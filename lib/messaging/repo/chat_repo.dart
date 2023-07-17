@@ -1,42 +1,34 @@
-import '../models/chat.dart';
+import 'dart:async';
+
+import 'package:firebase_database/firebase_database.dart';
+import 'package:y/main/repo/user_repo.dart';
+import 'package:y/messaging/models/chat.dart';
 
 class ChatRepo {
-  static List<ChatInfo> getChats() {
-    return chats;
+  static Stream<DatabaseEvent> getChatsStream() {
+    final DatabaseReference chatsRef = FirebaseDatabase.instance
+        .ref('users/${UserRepo.currentUser!.uid}/chats');
+
+    return chatsRef.onValue;
   }
 
-  static List<ChatInfo> chats = [
-    ChatInfo(
-      id: '1',
-      name: 'Darlene Robertson',
-      avatar: 'https://i.pravatar.cc/240#0',
-      lastMessage: 'Hello 👋',
-      lastMessageTime: DateTime.now(),
-      isOnline: true,
-    ),
-    ChatInfo(
-      id: '2',
-      name: 'Daril Rodriguez',
-      avatar: 'https://i.pravatar.cc/240#1',
-      lastMessage: 'Hello',
-      lastMessageTime: DateTime.now(),
-      isOnline: false,
-    ),
-    ChatInfo(
-      id: '3',
-      name: 'Jon Maquin',
-      avatar: 'https://i.pravatar.cc/240#2',
-      lastMessage: 'Hello',
-      lastMessageTime: DateTime.now(),
-      isOnline: true,
-    ),
-    ChatInfo(
-      id: '4',
-      name: 'Pamela Anderson',
-      avatar: 'https://i.pravatar.cc/240#3',
-      lastMessage: 'Hello',
-      lastMessageTime: DateTime.now(),
-      isOnline: false,
-    ),
-  ];
+  static Stream<ChatInfo?> getChatInfoStream(String chatId) {
+    final DatabaseReference chatRef =
+        FirebaseDatabase.instance.ref('chats/$chatId');
+
+    Stream<ChatInfo?> stream = chatRef.onValue.map((event) {
+      if (event.snapshot.exists) {
+        Map<String, dynamic> dataChatInfo =
+            Map<String, dynamic>.from(event.snapshot.value as Map);
+
+        dataChatInfo['id'] = event.snapshot.key;
+
+        return ChatInfo.fromJson(dataChatInfo);
+      }
+
+      return null;
+    });
+
+    return stream;
+  }
 }

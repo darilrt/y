@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>206359178622-ve04trfcj77eqhc6tk6sg7f2jlj6u6bo.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.206359178622-ve04trfcj77eqhc6tk6sg7f2jlj6u6bo</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBPKVlnIIEftqHIs3rq5DmV2y_n-8AifyE</string>
+	<key>GCM_SENDER_ID</key>
+	<string>206359178622</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.y</string>
+	<key>PROJECT_ID</key>
+	<string>daril-y</string>
+	<key>STORAGE_BUCKET</key>
+	<string>daril-y.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:206359178622:ios:59acad61e79dad442a572f</string>
+	<key>DATABASE_URL</key>
+	<string>https://daril-y-default-rtdb.firebaseio.com</string>
+</dict>
+</plist>

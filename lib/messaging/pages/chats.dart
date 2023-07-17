@@ -1,3 +1,4 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:y/messaging/repo/chat_repo.dart';
 import 'package:y/messaging/widgets/chat_item.dart';
@@ -9,8 +10,6 @@ class ChatsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<ChatInfo> chats = ChatRepo.getChats();
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -26,12 +25,44 @@ class ChatsPage extends StatelessWidget {
           ),
         ],
       ),
-      body: ListView.builder(
-        itemExtent: 85,
-        itemCount: chats.length,
-        itemBuilder: (context, index) => ChatItem(
-          info: chats[index],
-        ),
+      body: StreamBuilder<DatabaseEvent>(
+        stream: ChatRepo.getChatsStream(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData && snapshot.data!.snapshot.value != null) {
+            List<Object?> chats =
+                (snapshot.data!.snapshot.value as List<Object?>);
+
+            return ListView.builder(
+              itemCount: chats.length,
+              itemBuilder: (context, index) {
+                if (chats[index] == null) {
+                  return const SizedBox();
+                }
+
+                String chatId = chats[index]! as String;
+
+                return StreamBuilder<ChatInfo?>(
+                  stream: ChatRepo.getChatInfoStream(chatId),
+                  builder: (context, chatInfo) {
+                    if (snapshot.hasData) {
+                      return chatInfo.data != null
+                          ? ChatItem(
+                              info: chatInfo.data!,
+                            )
+                          : const SizedBox();
+                    } else {
+                      return const SizedBox();
+                    }
+                  },
+                );
+              },
+            );
+          } else {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
       ),
     );
   }
