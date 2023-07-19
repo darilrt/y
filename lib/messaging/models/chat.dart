@@ -30,7 +30,7 @@ class ChatInfo {
         ? Message.fromJsonList(json['messages'])
         : <Message>[];
 
-    final Message? lastMessage = messages.isNotEmpty ? messages.last : null;
+    final Message? lastMessage = messages.isNotEmpty ? messages.first : null;
 
     if (json['users'] != null && json['users'].length <= 2) {}
 

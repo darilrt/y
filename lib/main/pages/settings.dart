@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:y/utils/route.dart';
 import '../repo/user_repo.dart';
+import 'settings/edit_profile.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -7,7 +9,13 @@ class SettingsPage extends StatelessWidget {
   void _onLogout(BuildContext context) {
     UserRepo.logout();
     Navigator.pop(context);
-    Navigator.pushReplacementNamed(context, '/login');
+    Navigator.pushReplacementNamed(context, '/loading');
+  }
+
+  void _onEditProfile(BuildContext context) {
+    Navigator.of(context).push(YPageRoute(
+      page: const EditProfilePage(),
+    ));
   }
 
   @override
@@ -24,6 +32,19 @@ class SettingsPage extends StatelessWidget {
       ),
       body: ListView(
         children: [
+          ListTile(
+            leading: const Icon(Icons.edit),
+            title: const Text(
+              'Edit profile',
+              style: textStyle,
+            ),
+            onTap: () {
+              _onEditProfile(context);
+            },
+          ),
+          const Divider(
+            height: 1,
+          ),
           ListTile(
             leading: const Icon(Icons.logout),
             title: const Text(

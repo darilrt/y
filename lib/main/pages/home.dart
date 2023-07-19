@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:y/messaging/pages/chats.dart';
 import '../widgets/navbar.dart';
-import 'profile_page.dart';
+import 'profile.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -11,30 +11,30 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedTab = 2;
+  int _selectedTab = 1;
 
   final List<IconData> icons = [
     Icons.person,
     // Icons.search,
-    Icons.apps,
+    // Icons.apps,
     // Icons.notificatiwwons,
     Icons.message,
   ];
 
   Widget _buildBody() {
+    // TODO: Implement other pages
     switch (icons[_selectedTab]) {
       case Icons.message:
         return const ChatsPage();
 
       case Icons.search:
-        return const Text("Search"); // TODO: Implement search page
+        return const Text("Search");
 
       case Icons.apps:
-        return const Text("Apps"); // TODO: Implement apps page
+        return const Text("Apps");
 
       case Icons.notifications:
-        return const Text(
-            "Notifications"); // TODO: Implement notifications page
+        return const Text("Notifications");
 
       case Icons.person:
         return const ProfilePage();

@@ -59,7 +59,13 @@ class ChatsPage extends StatelessWidget {
             );
           } else {
             return const Center(
-              child: CircularProgressIndicator(),
+              child: Text(
+                'No chats yet :\'c',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Color.fromARGB(255, 99, 99, 99),
+                ),
+              ),
             );
           }
         },

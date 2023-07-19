@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:firebase_database/firebase_database.dart';
+import '../constants/user.dart';
 import '../models/user.dart';
 
 class UserRepo {
@@ -41,23 +42,38 @@ class UserRepo {
     return _currentUser;
   }
 
-  static Future<User?> register(String username, String password) async {
-    _currentUser = User(
-      uid: '1234567890',
-      name: 'John Doe',
-      username: username,
-      avatar: 'https://i.pravatar.cc/240',
-      email: 'johndoe@example.com',
-      emailVerified: false,
-      disabled: false,
-      lastSignInTime: DateTime.now(),
-      creationTime: DateTime.now(),
-      lastRefreshTime: DateTime.now(),
-      tokensValidAfterTime: DateTime.now(),
-      chats: [],
-    );
+  static Future<User?> register(
+      String email, String password, String username, String name) async {
+    try {
+      final auth.UserCredential userCredential =
+          await auth.FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-    return _currentUser;
+      FirebaseDatabase.instance.ref('users/${userCredential.user!.uid}').set({
+        'username': username,
+        'name': name,
+        'email': email,
+        'avatar': UserConstants.avatarDefault,
+        'cover': UserConstants.coverDefault,
+        'friends': [],
+        'chats': [],
+        'createdAt': DateTime.now().millisecondsSinceEpoch,
+      });
+
+      await UserRepo.login(email, password);
+
+      return _currentUser;
+    } on auth.FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        throw Exception('The password provided is too weak.');
+      } else if (e.code == 'email-already-in-use') {
+        throw Exception('The account already exists for that email.');
+      } else {
+        throw Exception(e.message);
+      }
+    }
   }
 
   static Future<bool> isLogged() async {
@@ -122,5 +138,40 @@ class UserRepo {
 
       return null;
     });
+  }
+
+  static Stream<List<String>> getFriendsStream(String uid) {
+    final DatabaseReference friendsRef =
+        FirebaseDatabase.instance.ref('users/$uid/friends');
+
+    return friendsRef.onValue.map((event) {
+      if (event.snapshot.exists) {
+        List<Object?> data = event.snapshot.value as List<Object?>;
+
+        List<String> friends = [];
+
+        for (var friend in data) {
+          friends.add(friend as String);
+        }
+
+        return friends;
+      }
+
+      return [];
+    });
+  }
+
+  static void updateAvatar(String value) {
+    FirebaseDatabase.instance
+        .ref('users/${_currentUser!.uid}/avatar')
+        .set(value);
+  }
+
+  static void updateUser({required String name, required String username}) {
+    FirebaseDatabase.instance.ref('users/${_currentUser!.uid}/name').set(name);
+
+    FirebaseDatabase.instance
+        .ref('users/${_currentUser!.uid}/username')
+        .set(username);
   }
 }

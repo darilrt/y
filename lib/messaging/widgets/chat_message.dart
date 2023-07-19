@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:y/messaging/models/message.dart';
 
 class ChatMessage extends StatelessWidget {
   const ChatMessage({Key? key, required this.message, required this.isMe})
       : super(key: key);
 
-  final String message;
+  final Message message;
   final bool isMe;
 
   @override
@@ -15,6 +16,9 @@ class ChatMessage extends StatelessWidget {
       mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
       children: [
         Container(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.7,
+          ),
           margin: const EdgeInsets.symmetric(
             horizontal: 20,
             vertical: 5,
@@ -32,14 +36,46 @@ class ChatMessage extends StatelessWidget {
               bottomRight: isMe ? const Radius.circular(0) : radius,
             ),
           ),
-          child: Text(
-            message,
-            style: const TextStyle(
-              fontSize: 16,
-            ),
+          child: Column(
+            crossAxisAlignment:
+                isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+            children: [
+              Text(
+                message.message,
+                style: const TextStyle(
+                  fontSize: 16,
+                ),
+              ),
+              Transform.translate(
+                offset: Offset(isMe ? 5 : -3, 2),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '${message.createdAt.hour.toString().padLeft(2, '0')}:${message.createdAt.minute.toString().padLeft(2, '0')}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    if (isMe) messageStatus(),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ],
+    );
+  }
+
+  Widget messageStatus() {
+    return const Icon(
+      Icons.done,
+      size: 15,
     );
   }
 }

@@ -39,11 +39,95 @@ class ChatItem extends StatelessWidget {
   }
 
   buildGroupChat(BuildContext context) {
-    return Text(
-      info.name,
-      style: const TextStyle(
-        fontSize: 20,
-      ),
+    String messageWrapped = info.lastMessage.length > 30
+        ? info.lastMessage.substring(0, 25)
+        : info.lastMessage;
+
+    if (info.lastMessage.length > 30) messageWrapped += '...';
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Transform.translate(
+          offset: const Offset(0, 0),
+          child: CircleAvatar(
+            radius: 25,
+            backgroundImage: NetworkImage(info.avatar),
+          ),
+        ),
+        const SizedBox(
+          width: 15,
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(
+                  Icons.people_alt_rounded,
+                  size: 16,
+                  color: Colors.grey,
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                Text(
+                  info.name,
+                  style: const TextStyle(
+                    fontSize: 20,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            Text(
+              messageWrapped,
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.grey,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+        const Spacer(),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Container(
+              padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+              decoration: BoxDecoration(
+                color:
+                    info.messagesCount > 0 ? Colors.blue : Colors.transparent,
+                borderRadius: BorderRadius.circular(100),
+              ),
+              child: Text(
+                info.messagesCount.toString(),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: info.messagesCount > 0
+                      ? Colors.white
+                      : Colors.transparent,
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            Text(
+              lastMessageTime(info.lastMessageTime),
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.grey,
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -114,8 +198,29 @@ class ChatItem extends StatelessWidget {
               const Spacer(),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                    decoration: BoxDecoration(
+                      color: info.messagesCount > 0
+                          ? Colors.blue
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    child: Text(
+                      info.messagesCount.toString(),
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: info.messagesCount > 0
+                            ? Colors.white
+                            : Colors.transparent,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
                   Text(
                     lastMessageTime(info.lastMessageTime),
                     style: const TextStyle(
@@ -123,25 +228,6 @@ class ChatItem extends StatelessWidget {
                       color: Colors.grey,
                     ),
                   ),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  info.messagesCount > 0
-                      ? Container(
-                          padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                          decoration: BoxDecoration(
-                            color: Colors.blue,
-                            borderRadius: BorderRadius.circular(100),
-                          ),
-                          child: Text(
-                            info.messagesCount.toString(),
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                            ),
-                          ),
-                        )
-                      : const SizedBox.shrink(),
                 ],
               ),
             ],

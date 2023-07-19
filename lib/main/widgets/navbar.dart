@@ -13,7 +13,7 @@ class NavBar extends StatefulWidget {
 }
 
 class _NavBarState extends State<NavBar> {
-  int _selectedIndex = 2;
+  int _selectedIndex = 1;
 
   void _onItemTapped(int index) {
     setState(() {

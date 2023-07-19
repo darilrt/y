@@ -82,7 +82,7 @@ class _ChatPageState extends State<ChatPage> {
 
                             return message != null
                                 ? ChatMessage(
-                                    message: message.message,
+                                    message: message,
                                     isMe: message.senderId == me.uid,
                                   )
                                 : const SizedBox();
@@ -144,8 +144,12 @@ class _ChatPageState extends State<ChatPage> {
                     );
                   }
 
+                  final otherUserId = info.users.firstWhere(
+                    (element) => element != me.uid,
+                  );
+
                   return StreamBuilder<User?>(
-                    stream: UserRepo.getUserStream(info.users.first),
+                    stream: UserRepo.getUserStream(otherUserId),
                     builder: (context, snapshot) {
                       if (snapshot.hasData && snapshot.data != null) {
                         User user = snapshot.data!;
