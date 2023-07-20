@@ -165,6 +165,8 @@ class UserRepo {
     FirebaseDatabase.instance
         .ref('users/${_currentUser!.uid}/avatar')
         .set(value);
+
+    updateModifiedAt();
   }
 
   static void updateUser({required String name, required String username}) {
@@ -173,5 +175,13 @@ class UserRepo {
     FirebaseDatabase.instance
         .ref('users/${_currentUser!.uid}/username')
         .set(username);
+
+    updateModifiedAt();
+  }
+
+  static void updateModifiedAt() {
+    FirebaseDatabase.instance
+        .ref('users/${_currentUser!.uid}/modifiedAt')
+        .set(DateTime.now().millisecondsSinceEpoch);
   }
 }
