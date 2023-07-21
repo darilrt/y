@@ -38,6 +38,7 @@ class MyApp extends StatelessWidget {
       theme: YThemes.dark(),
       initialRoute: "/loading",
       routes: {
+        "/": (context) => const LoadingPage(),
         "/loading": (context) => const LoadingPage(),
         "/home": (context) => const HomePage(),
         "/login": (context) => LoginPage(),
