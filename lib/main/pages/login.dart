@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:y/main/repo/user_repo.dart';
+import 'package:y/utils/loading.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({Key? key}) : super(key: key);
@@ -16,6 +17,8 @@ class LoginPage extends StatelessWidget {
       );
       return;
     }
+
+    Loading.showLoading(context);
 
     UserRepo.login(emailController.text, passwordController.text).then((value) {
       if (value != null) {
