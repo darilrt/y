@@ -9,6 +9,32 @@ class FriendListItem extends StatelessWidget {
   final User user;
   final Function() onTap;
 
+  void _onUnfriend(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Unfriend"),
+          content: const Text("Are you sure you want to unfriend this user?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("Unfriend"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -61,31 +87,7 @@ class FriendListItem extends StatelessWidget {
                   minimumSize: const Size(100, 30),
                 ),
                 onPressed: () {
-                  // show message dialog to confirm unfriend
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: const Text("Unfriend"),
-                        content: const Text(
-                            "Are you sure you want to unfriend this user?"),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text("Cancel"),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text("Unfriend"),
-                          ),
-                        ],
-                      );
-                    },
-                  );
+                  _onUnfriend(context);
                 },
                 child: const Text("Friend"),
               ),
