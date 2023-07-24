@@ -32,7 +32,11 @@ class ChatInfo {
 
     final Message? lastMessage = messages.isNotEmpty ? messages.first : null;
 
-    if (json['users'] != null && json['users'].length <= 2) {}
+    List<String> users = [];
+
+    json['users'].forEach((key, value) {
+      users.add(value as String);
+    });
 
     return ChatInfo(
       id: json['id'],
@@ -45,9 +49,7 @@ class ChatInfo {
       messages: messages,
       messagesCount: json['messagesCount'] ?? 0,
       isGroup: json['users'] != null && json['users'].length > 2,
-      users: json['users'] != null
-          ? List<String>.from(json['users'] as List)
-          : <String>[],
+      users: users,
     );
   }
 }

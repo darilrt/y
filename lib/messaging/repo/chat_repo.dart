@@ -16,14 +16,19 @@ class ChatRepo {
     final DatabaseReference chatRef =
         FirebaseDatabase.instance.ref('chats/$chatId');
 
-    Stream<ChatInfo?> stream = chatRef.onValue.map((event) {
+    Stream<ChatInfo?> stream = chatRef.onValue.map((DatabaseEvent event) {
       if (event.snapshot.exists) {
-        Map<String, dynamic> dataChatInfo =
-            Map<String, dynamic>.from(event.snapshot.value as Map);
+        final dataChatInfo = event.snapshot.value as Map<Object?, dynamic>;
 
         dataChatInfo['id'] = event.snapshot.key;
 
-        return ChatInfo.fromJson(dataChatInfo);
+        Map<String, dynamic> chatInfo = {};
+
+        dataChatInfo.forEach((key, value) {
+          chatInfo[key.toString()] = value;
+        });
+
+        return ChatInfo.fromJson(chatInfo);
       }
 
       return null;

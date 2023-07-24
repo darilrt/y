@@ -10,4 +10,8 @@ class Loading {
       ),
     );
   }
+
+  static void hideLoading(BuildContext context) {
+    Navigator.of(context).pop();
+  }
 }

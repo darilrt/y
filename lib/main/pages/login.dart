@@ -21,6 +21,8 @@ class LoginPage extends StatelessWidget {
     Loading.showLoading(context);
 
     UserRepo.login(emailController.text, passwordController.text).then((value) {
+      Loading.hideLoading(context);
+
       if (value != null) {
         Navigator.pushReplacementNamed(context, '/home');
       } else {
@@ -31,6 +33,8 @@ class LoginPage extends StatelessWidget {
         );
       }
     }).catchError((error) {
+      Loading.hideLoading(context);
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(error.message),

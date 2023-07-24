@@ -26,8 +26,13 @@ class Message {
     final Map<String, dynamic> data = Map<String, dynamic>.from(json as Map);
 
     data.forEach((key, value) {
-      Map<String, dynamic> res = Map<String, dynamic>.from(value as Map);
-      res['id'] = key;
+      Map<String, dynamic> res = {
+        'id': key,
+      };
+
+      value.forEach((key, value) {
+        res[key.toString()] = value;
+      });
 
       messages.add(Message.fromJson(res));
     });

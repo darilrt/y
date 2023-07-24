@@ -122,9 +122,33 @@ class RegisterPage extends StatelessWidget {
         Navigator.pushReplacementNamed(_emailFocusNode.context!, '/loading');
       }
     }).onError((error, stackTrace) {
+      String message = 'Register failed';
+
+      if (error is Exception) {
+        message = error.toString();
+
+        if (message.contains('EMAIL_EXISTS')) {
+          message = 'Email already exists';
+        } else if (message.contains('WEAK_PASSWORD')) {
+          message = 'Password is too weak';
+        } else if (message.contains('INVALID_EMAIL')) {
+          message = 'Invalid email';
+        } else if (message.contains('USERNAME_EXISTS')) {
+          message = 'Username already exists';
+        } else if (message.contains('USERNAME_TOO_SHORT')) {
+          message = 'Username is too short';
+        } else if (message.contains('USERNAME_TOO_LONG')) {
+          message = 'Username is too long';
+        } else if (message.contains('USERNAME_INVALID')) {
+          message = 'Username is invalid';
+        } else if (message.contains('USERNAME_TAKEN')) {
+          message = 'Username is taken';
+        }
+      }
+
       ScaffoldMessenger.of(_emailFocusNode.context!).showSnackBar(
-        const SnackBar(
-          content: Text('Register failed'),
+        SnackBar(
+          content: Text(message),
         ),
       );
     });

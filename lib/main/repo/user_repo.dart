@@ -1,7 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart' as auth;
-import 'package:firebase_database/firebase_database.dart';
-import '../constants/user.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:y/utils/http.dart';
 import '../models/user.dart';
+
+const storage = FlutterSecureStorage();
 
 class UserRepo {
   static User? _currentUser;
@@ -11,75 +12,76 @@ class UserRepo {
   }
 
   static Future<User?> login(String email, String password) async {
-    try {
-      final auth.UserCredential userCredential =
-          await auth.FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+    Http.setBearerToken('');
 
-      _currentUser = await UserRepo.getUser(userCredential.user!.uid);
+    Map<String, dynamic> res = await Http.post(
+      '/auth/signin',
+      body: {
+        'email': email,
+        'password': password,
+      },
+    );
 
-      if (_currentUser == null) {
-        throw Exception('No user found for that email.');
-      }
-
-      return _currentUser;
-    } on auth.FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        throw Exception('No user found for that email.');
-      } else if (e.code == 'wrong-password') {
-        throw Exception('Wrong password provided for that user.');
-      } else {
-        throw Exception(e.message);
-      }
+    if (res['error'] != null) {
+      throw Exception(res['error']);
     }
+
+    Http.setBearerToken(res['token'] as String);
+    final Map<String, dynamic> data = (await Http.get('/users/me'));
+
+    storage.write(key: 'auth_token', value: res['token']);
+
+    _currentUser = User.fromJson(data);
+    return _currentUser;
   }
 
   static User? logout() {
-    auth.FirebaseAuth.instance.signOut();
+    Http.post('/auth/signout');
+
+    Http.setBearerToken('');
+    storage.delete(key: 'auth_token');
+
     _currentUser = null;
     return _currentUser;
   }
 
   static Future<User?> register(
       String email, String password, String username, String name) async {
-    try {
-      final auth.UserCredential userCredential =
-          await auth.FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+    Http.setBearerToken('');
 
-      FirebaseDatabase.instance.ref('users/${userCredential.user!.uid}').set({
+    Map<String, dynamic> res = await Http.post(
+      '/auth/signup',
+      body: {
+        'email': email,
+        'password': password,
         'username': username,
         'name': name,
-        'email': email,
-        'avatar': UserConstants.avatarDefault,
-        'cover': UserConstants.coverDefault,
-        'friends': [],
-        'chats': [],
-        'createdAt': DateTime.now().millisecondsSinceEpoch,
-      });
+      },
+    );
 
-      await UserRepo.login(email, password);
-
-      return _currentUser;
-    } on auth.FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        throw Exception('The password provided is too weak.');
-      } else if (e.code == 'email-already-in-use') {
-        throw Exception('The account already exists for that email.');
-      } else {
-        throw Exception(e.message);
-      }
+    if (res['error'] != null) {
+      throw Exception(res['error']);
     }
+
+    Http.setBearerToken(res['token'] as String);
+    final Map<String, dynamic> data = (await Http.get('/users/me'));
+
+    _currentUser = User.fromJson(data);
+
+    return _currentUser;
   }
 
   static Future<bool> isLogged() async {
-    if (auth.FirebaseAuth.instance.currentUser != null) {
-      _currentUser =
-          await UserRepo.getUser(auth.FirebaseAuth.instance.currentUser!.uid);
+    String? token = await storage.read(key: 'auth_token');
+    if (token != null) {
+      Http.setBearerToken(token);
+      final Map<String, dynamic> data = (await Http.get('/users/me'));
+
+      if (data['error'] != null) {
+        return false;
+      }
+
+      _currentUser = User.fromJson(data);
     } else {
       _currentUser = null;
     }
@@ -87,101 +89,33 @@ class UserRepo {
     return _currentUser != null;
   }
 
-  static Future<User?> getUser(String uid, {Function? callback}) async {
-    final DatabaseReference userRef =
-        FirebaseDatabase.instance.ref('users/$uid');
+  static Future<User?> getUser(String uid) async {
+    final Map<String, dynamic> data = (await Http.get('/users/$uid'));
 
-    final DataSnapshot snapshot = await userRef.get();
-
-    if (callback != null) {
-      snapshot.ref.onValue.listen((event) {
-        if (event.snapshot.exists) {
-          Map<String, dynamic> data =
-              Map<String, dynamic>.from(event.snapshot.value as Map);
-
-          data['uid'] = event.snapshot.key;
-
-          User user = User.fromJson(data);
-
-          callback(user);
-        }
-      });
+    if (data['error'] != null) {
+      throw Exception(data['error']);
     }
 
-    if (snapshot.exists) {
-      Map<String, dynamic> data =
-          Map<String, dynamic>.from(snapshot.value as Map);
-
-      data['uid'] = uid;
-
-      User user = User.fromJson(data);
-
-      return user;
-    }
-
-    return null;
+    return User.fromJson(data);
   }
 
   static Stream<User?> getUserStream(String otherUserId) {
-    final DatabaseReference userRef =
-        FirebaseDatabase.instance.ref('users/$otherUserId');
+    final data = Http.get('/users/$otherUserId');
 
-    return userRef.onValue.map((event) {
-      if (event.snapshot.exists) {
-        Map<String, dynamic> data =
-            Map<String, dynamic>.from(event.snapshot.value as Map);
-
-        data['uid'] = event.snapshot.key;
-
-        return User.fromJson(data);
+    return data.asStream().map((event) {
+      if (event['error'] != null) {
+        throw Exception(event['error']);
       }
 
-      return null;
+      return User.fromJson(event);
     });
   }
 
   static Stream<List<String>> getFriendsStream(String uid) {
-    final DatabaseReference friendsRef =
-        FirebaseDatabase.instance.ref('users/$uid/friends');
-
-    return friendsRef.onValue.map((event) {
-      if (event.snapshot.exists) {
-        List<Object?> data = event.snapshot.value as List<Object?>;
-
-        List<String> friends = [];
-
-        for (var friend in data) {
-          friends.add(friend as String);
-        }
-
-        return friends;
-      }
-
-      return [];
-    });
+    return const Stream<List<String>>.empty();
   }
 
-  static void updateAvatar(String value) {
-    FirebaseDatabase.instance
-        .ref('users/${_currentUser!.uid}/avatar')
-        .set(value);
+  static void updateAvatar(String value) {}
 
-    updateModifiedAt();
-  }
-
-  static void updateUser({required String name, required String username}) {
-    FirebaseDatabase.instance.ref('users/${_currentUser!.uid}/name').set(name);
-
-    FirebaseDatabase.instance
-        .ref('users/${_currentUser!.uid}/username')
-        .set(username);
-
-    updateModifiedAt();
-  }
-
-  static void updateModifiedAt() {
-    FirebaseDatabase.instance
-        .ref('users/${_currentUser!.uid}/modifiedAt')
-        .set(DateTime.now().millisecondsSinceEpoch);
-  }
+  static void updateUser({required String name, required String username}) {}
 }

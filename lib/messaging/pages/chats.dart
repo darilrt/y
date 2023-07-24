@@ -29,17 +29,19 @@ class ChatsPage extends StatelessWidget {
         stream: ChatRepo.getChatsStream(),
         builder: (context, snapshot) {
           if (snapshot.hasData && snapshot.data!.snapshot.value != null) {
-            List<Object?> chats =
-                (snapshot.data!.snapshot.value as List<Object?>);
+            final Map<String, dynamic> data =
+                Map<String, dynamic>.from(snapshot.data!.snapshot.value as Map);
+
+            List<String> chats = [];
+
+            data.forEach((key, value) {
+              chats.add(value as String);
+            });
 
             return ListView.builder(
               itemCount: chats.length,
               itemBuilder: (context, index) {
-                if (chats[index] == null) {
-                  return const SizedBox();
-                }
-
-                String chatId = chats[index]! as String;
+                String chatId = chats[index];
 
                 return StreamBuilder<ChatInfo?>(
                   stream: ChatRepo.getChatInfoStream(chatId),

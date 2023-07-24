@@ -12,7 +12,6 @@ class User {
   final DateTime lastSignInTime;
   final DateTime creationTime;
   final DateTime lastRefreshTime;
-  final DateTime tokensValidAfterTime;
   final List<String> chats;
   final List<String> friends;
 
@@ -28,7 +27,6 @@ class User {
     required this.lastSignInTime,
     required this.creationTime,
     required this.lastRefreshTime,
-    required this.tokensValidAfterTime,
     required this.chats,
     required this.friends,
   });
@@ -38,11 +36,19 @@ class User {
     List<String> friends = [];
 
     if (json['chats'] != null) {
-      chats = List<String>.from(json['chats']);
+      final data = json["chats"] as Map<Object?, dynamic>;
+
+      data.forEach((key, value) {
+        chats.add(value as String);
+      });
     }
 
     if (json['friends'] != null) {
-      friends = List<String>.from(json['friends']);
+      final data = json["friends"] as Map<Object?, dynamic>;
+
+      data.forEach((key, value) {
+        friends.add(value as String);
+      });
     }
 
     return User(
@@ -59,26 +65,11 @@ class User {
       lastSignInTime: DateTime.now(),
       creationTime: DateTime.now(),
       lastRefreshTime: DateTime.now(),
-      tokensValidAfterTime: DateTime.now(), // TODO: Parse from json
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'uid': uid,
-      'name': name,
-      'email': email,
-      'emailVerified': emailVerified,
-      'username': username,
-      'avatar': avatar,
-      'disabled': disabled,
-      'metadata': {
-        'lastSignInTime': lastSignInTime.toIso8601String(),
-        'creationTime': creationTime.toIso8601String(),
-        'lastRefreshTime': lastRefreshTime.toIso8601String(),
-      },
-      'tokensValidAfterTime': tokensValidAfterTime.toIso8601String(),
-    };
+    return {};
   }
 
   @override
