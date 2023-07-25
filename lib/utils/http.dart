@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 class Http {
-  static const String baseUrl = 'http://192.168.1.5:8000';
+  static const String baseUrl = 'http://192.168.1.6:8000';
   static String bearerToken = '';
 
   static Map<String, String> headers = {

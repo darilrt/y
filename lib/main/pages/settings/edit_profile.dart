@@ -55,7 +55,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     String? newUrl = _avatarFile;
 
     if (newUrl != null) {
-      StoreRepo.uploadFile(newUrl, 'avatars/${user.uid}').then((url) {
+      StoreRepo.uploadFile(newUrl, 'avatars/${user.id}').then((url) {
         UserRepo.updateUser(
           name: _nameController.text,
           username: _usernameController.text,
@@ -83,7 +83,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   Widget buildBanner(BuildContext context) {
     return StreamBuilder<User?>(
-        stream: UserRepo.getUserStream(UserRepo.currentUser!.uid),
+        stream: UserRepo.getUserStream(UserRepo.currentUser!.id),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return const Center(

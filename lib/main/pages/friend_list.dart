@@ -26,11 +26,11 @@ class FriendListPage extends StatelessWidget {
           ),
         ],
       ),
-      body: StreamBuilder<List<String>>(
-        stream: UserRepo.getFriendsStream(me.uid),
+      body: StreamBuilder<List<int>>(
+        stream: UserRepo.getFriendsStream(me.id),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            List<String> friends = snapshot.data!;
+            List<int> friends = snapshot.data!;
 
             if (friends.isEmpty) {
               return const Center(

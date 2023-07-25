@@ -1,7 +1,7 @@
 import '../constants/user.dart';
 
 class User {
-  final String uid;
+  final int id;
   final String name;
   final String email;
   final bool emailVerified;
@@ -13,10 +13,10 @@ class User {
   final DateTime creationTime;
   final DateTime lastRefreshTime;
   final List<String> chats;
-  final List<String> friends;
+  final List<User> friends;
 
   User({
-    required this.uid,
+    required this.id,
     required this.name,
     required this.email,
     required this.emailVerified,
@@ -33,7 +33,7 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     List<String> chats = [];
-    List<String> friends = [];
+    List<User> friends = [];
 
     if (json['chats'] != null) {
       final data = json["chats"] as Map<Object?, dynamic>;
@@ -44,15 +44,15 @@ class User {
     }
 
     if (json['friends'] != null) {
-      final data = json["friends"] as Map<Object?, dynamic>;
+      final data = json["friends"] as List<Object?>;
 
-      data.forEach((key, value) {
-        friends.add(value as String);
-      });
+      for (var value in data) {
+        friends.add(User.fromJson(value as Map<String, dynamic>));
+      }
     }
 
     return User(
-      uid: json['uid'],
+      id: json['id'],
       name: json['name'],
       email: json['email'] ?? '',
       emailVerified: json['emailVerified'] ?? false,
@@ -74,6 +74,6 @@ class User {
 
   @override
   String toString() {
-    return 'User(uid: $uid, username: @$username)';
+    return 'User(uid: $id, username: @$username)';
   }
 }

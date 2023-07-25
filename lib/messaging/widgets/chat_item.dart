@@ -138,11 +138,11 @@ class ChatItem extends StatelessWidget {
 
     if (info.lastMessage.length > 30) messageWrapped += '...';
 
-    final otherUserId = info.users
-        .firstWhere((element) => element != UserRepo.currentUser!.uid);
+    final otherUserId =
+        info.users.firstWhere((element) => element != UserRepo.currentUser!.id);
 
     return StreamBuilder<User?>(
-        stream: UserRepo.getUserStream(otherUserId),
+        stream: UserRepo.getUserStream(1),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return const SizedBox.shrink();

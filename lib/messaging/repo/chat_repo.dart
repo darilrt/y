@@ -7,7 +7,7 @@ import 'package:y/messaging/models/chat.dart';
 class ChatRepo {
   static Stream<DatabaseEvent> getChatsStream() {
     final DatabaseReference chatsRef = FirebaseDatabase.instance
-        .ref('users/${UserRepo.currentUser!.uid}/chats');
+        .ref('users/${UserRepo.currentUser!.id}/chats');
 
     return chatsRef.onValue;
   }

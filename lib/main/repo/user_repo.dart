@@ -90,7 +90,7 @@ class UserRepo {
   }
 
   static Future<User?> getUser(String uid) async {
-    final Map<String, dynamic> data = (await Http.get('/users/$uid'));
+    final Map<String, dynamic> data = await Http.get('/users/$uid');
 
     if (data['error'] != null) {
       throw Exception(data['error']);
@@ -99,7 +99,7 @@ class UserRepo {
     return User.fromJson(data);
   }
 
-  static Stream<User?> getUserStream(String otherUserId) {
+  static Stream<User?> getUserStream(int otherUserId) {
     final data = Http.get('/users/$otherUserId');
 
     return data.asStream().map((event) {
@@ -111,8 +111,8 @@ class UserRepo {
     });
   }
 
-  static Stream<List<String>> getFriendsStream(String uid) {
-    return const Stream<List<String>>.empty();
+  static Stream<List<int>> getFriendsStream(int id) {
+    return const Stream<List<int>>.empty();
   }
 
   static void updateAvatar(String value) {}

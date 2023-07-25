@@ -9,104 +9,94 @@ class ProfilePage extends StatelessWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
   Widget buildBanner(BuildContext context) {
-    return StreamBuilder<User?>(
-        stream: UserRepo.getUserStream(UserRepo.currentUser!.uid),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
+    User user = UserRepo.currentUser!;
 
-          User user = snapshot.data!;
-
-          return Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: NetworkImage(
-                  user.cover,
-                ),
-                fit: BoxFit.cover,
-              ),
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: NetworkImage(
+            user.cover,
+          ),
+          fit: BoxFit.cover,
+        ),
+      ),
+      height: 130,
+      padding: const EdgeInsets.fromLTRB(20, 25, 20, 15),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CircleAvatar(
+            radius: 40,
+            backgroundImage: NetworkImage(
+              user.avatar,
             ),
-            height: 130,
-            padding: const EdgeInsets.fromLTRB(20, 25, 20, 15),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CircleAvatar(
-                  radius: 40,
-                  backgroundImage: NetworkImage(
-                    user.avatar,
-                  ),
+          ),
+          const SizedBox(
+            width: 20,
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                user.name,
+                style: const TextStyle(
+                  fontSize: 20,
                 ),
-                const SizedBox(
-                  width: 20,
+              ),
+              Text(
+                '@${user.username}',
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.white30,
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      user.name,
-                      style: const TextStyle(
-                        fontSize: 20,
-                      ),
+              ),
+              const SizedBox(
+                height: 5,
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        YPageRoute(
+                          page: const FriendListPage(),
+                        ),
+                      );
+                    },
+                    style: TextButton.styleFrom(
+                      minimumSize: const Size(0, 0),
+                      padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.transparent,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
-                    Text(
-                      '@${user.username}',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.white30,
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                    child: Row(
                       children: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              YPageRoute(
-                                page: const FriendListPage(),
-                              ),
-                            );
-                          },
-                          style: TextButton.styleFrom(
-                            minimumSize: const Size(0, 0),
-                            padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                            foregroundColor: Colors.white,
-                            backgroundColor: Colors.transparent,
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.person,
-                                size: 16,
-                              ),
-                              const SizedBox(
-                                width: 3,
-                              ),
-                              Text(
-                                getFriendCount(user.friends.length),
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ],
+                        const Icon(
+                          Icons.person,
+                          size: 16,
+                        ),
+                        const SizedBox(
+                          width: 3,
+                        ),
+                        Text(
+                          getFriendCount(user.friends.length),
+                          style: const TextStyle(
+                            fontSize: 16,
                           ),
                         ),
                       ],
                     ),
-                  ],
-                )
-              ],
-            ),
-          );
-        });
+                  ),
+                ],
+              ),
+            ],
+          )
+        ],
+      ),
+    );
   }
 
   @override

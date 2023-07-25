@@ -15,7 +15,7 @@ class MessageRepo {
 
     messagesRef.push().set({
       'message': message,
-      'senderId': me.uid,
+      'senderId': me.id,
       'createdAt': DateTime.now().millisecondsSinceEpoch,
     });
   }
