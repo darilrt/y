@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../models/user.dart';
-import '../../repo/store_repo.dart';
 import '../../repo/user_repo.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -17,18 +16,12 @@ class EditProfilePage extends StatefulWidget {
 class _EditProfilePageState extends State<EditProfilePage> {
   User user = UserRepo.currentUser!;
 
-  final DecorationImage _cover = const DecorationImage(
-    image: NetworkImage(
-      'https://papers.co/wallpaper/papers.co-vy45-digital-dark-square-color-bw-pattern-background-41-iphone-wallpaper.jpg',
-    ),
-    fit: BoxFit.cover,
-  );
-
   final TextEditingController _nameController = TextEditingController();
 
   final TextEditingController _usernameController = TextEditingController();
 
   String? _avatarFile;
+  String? _coverFile;
 
   void _onEditAvatar(BuildContext context) {
     final ImagePicker picker = ImagePicker();
@@ -44,6 +37,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
     });
   }
 
+  void _onEditCover(BuildContext context) {
+    final ImagePicker picker = ImagePicker();
+
+    picker.pickImage(source: ImageSource.gallery).then((file) {
+      if (file == null) {
+        return;
+      }
+
+      setState(() {
+        _coverFile = file.path;
+      });
+    });
+  }
+
   void _onSave(BuildContext context) {
     showDialog(
       context: context,
@@ -52,134 +59,144 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
     );
 
-    String? newUrl = _avatarFile;
-
-    if (newUrl != null) {
-      StoreRepo.uploadFile(newUrl, 'avatars/${user.id}').then((url) {
-        UserRepo.updateUser(
-          name: _nameController.text,
-          username: _usernameController.text,
-        );
-
-        UserRepo.updateAvatar(url);
-
+    if (_avatarFile != null || _coverFile != null) {
+      UserRepo.update(
+        name: _nameController.text,
+        username: _usernameController.text,
+        avatar: _avatarFile,
+        cover: _coverFile,
+      ).then((value) {
         setState(() {
           _avatarFile = null;
+          _coverFile = null;
+
+          Navigator.pop(context);
+          Navigator.pop(context);
+        });
+      }).onError((error, stackTrace) {
+        setState(() {
+          _avatarFile = null;
+          _coverFile = null;
+
+          Navigator.pop(context);
+          Navigator.pop(context);
         });
 
-        Navigator.pop(context);
-        Navigator.pop(context);
+        showAboutDialog(context: context, children: [
+          Text("Error updating profile, please try later. $error"),
+        ]);
       });
+
       return;
     }
 
-    UserRepo.updateUser(
+    UserRepo.update(
       name: _nameController.text,
       username: _usernameController.text,
-    );
-    Navigator.pop(context);
-    Navigator.pop(context);
+    ).then((value) {
+      Navigator.pop(context);
+      Navigator.pop(context);
+    });
   }
 
   Widget buildBanner(BuildContext context) {
-    return StreamBuilder<User?>(
-        stream: UserRepo.getUserStream(UserRepo.currentUser!.id),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
+    User user = UserRepo.currentUser!;
 
-          return Stack(
-            clipBehavior: Clip.none,
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            image: _coverFile == null
+                ? DecorationImage(
+                    image: NetworkImage(user.cover),
+                    fit: BoxFit.cover,
+                  )
+                : DecorationImage(
+                    image: FileImage(File(_coverFile!)),
+                    fit: BoxFit.cover,
+                  ),
+          ),
+          height: 130,
+          padding: const EdgeInsets.fromLTRB(20, 25, 20, 15),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  image: _cover,
-                ),
-                height: 130,
-                padding: const EdgeInsets.fromLTRB(20, 25, 20, 15),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        _avatarFile == null
-                            ? CircleAvatar(
-                                radius: 40,
-                                backgroundImage:
-                                    NetworkImage(snapshot.data!.avatar),
-                              )
-                            : CircleAvatar(
-                                radius: 40,
-                                backgroundImage: FileImage(File(_avatarFile!)),
-                              ),
-                        Positioned(
-                          bottom: -11,
-                          right: -13,
-                          child: TextButton(
-                            onPressed: () {
-                              _onEditAvatar(context);
-                            },
-                            style: ButtonStyle(
-                              minimumSize: MaterialStateProperty.all(
-                                const Size(0, 0),
-                              ),
-                              padding: MaterialStateProperty.all(
-                                const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                              ),
-                              shape: MaterialStateProperty.all(
-                                const CircleBorder(),
-                              ),
-                              backgroundColor: MaterialStateProperty.all(
-                                Colors.white,
-                              ),
-                            ),
-                            child: const Icon(
-                              size: 20,
-                              Icons.camera_alt,
-                              color: Colors.black,
-                            ),
-                          ),
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  _avatarFile == null
+                      ? CircleAvatar(
+                          radius: 40,
+                          backgroundImage: NetworkImage(user.avatar),
+                        )
+                      : CircleAvatar(
+                          radius: 40,
+                          backgroundImage: FileImage(File(_avatarFile!)),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              Positioned(
-                bottom: -25,
-                right: 40,
-                child: TextButton(
-                  onPressed: () {
-                    _onEditAvatar(context);
-                  },
-                  style: ButtonStyle(
-                    minimumSize: MaterialStateProperty.all(
-                      const Size(0, 0),
-                    ),
-                    padding: MaterialStateProperty.all(
-                      const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                    ),
-                    shape: MaterialStateProperty.all(
-                      const CircleBorder(),
-                    ),
-                    backgroundColor: MaterialStateProperty.all(
-                      Colors.white,
+                  Positioned(
+                    bottom: -11,
+                    right: -13,
+                    child: TextButton(
+                      onPressed: () {
+                        _onEditAvatar(context);
+                      },
+                      style: ButtonStyle(
+                        minimumSize: MaterialStateProperty.all(
+                          const Size(0, 0),
+                        ),
+                        padding: MaterialStateProperty.all(
+                          const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                        ),
+                        shape: MaterialStateProperty.all(
+                          const CircleBorder(),
+                        ),
+                        backgroundColor: MaterialStateProperty.all(
+                          Colors.white,
+                        ),
+                      ),
+                      child: const Icon(
+                        size: 20,
+                        Icons.camera_alt,
+                        color: Colors.black,
+                      ),
                     ),
                   ),
-                  child: const Icon(
-                    size: 20,
-                    Icons.photo_size_select_actual_rounded,
-                    color: Colors.black,
-                  ),
-                ),
+                ],
               ),
             ],
-          );
-        });
+          ),
+        ),
+        Positioned(
+          bottom: 3,
+          right: 10,
+          child: TextButton(
+            onPressed: () {
+              _onEditCover(context);
+            },
+            style: ButtonStyle(
+              minimumSize: MaterialStateProperty.all(
+                const Size(0, 0),
+              ),
+              padding: MaterialStateProperty.all(
+                const EdgeInsets.fromLTRB(10, 5, 10, 5),
+              ),
+              shape: MaterialStateProperty.all(
+                const CircleBorder(),
+              ),
+              backgroundColor: MaterialStateProperty.all(
+                Colors.white,
+              ),
+            ),
+            child: const Icon(
+              size: 20,
+              Icons.photo_size_select_actual_rounded,
+              color: Colors.black,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget buildInfoForm(BuildContext context) {

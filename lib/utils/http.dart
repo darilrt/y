@@ -24,30 +24,99 @@ class Http {
       uri = uri.replace(queryParameters: params);
     }
 
-    http.Response res = await http.get(
-      uri,
-      headers: Http.headers,
-    );
+    http.Response res = http.Response('', 500);
 
-    if (res.headers[HttpHeaders.contentTypeHeader] == 'application/json') {
-      return const JsonDecoder().convert(res.body);
+    try {
+      res = await http.get(
+        uri,
+        headers: Http.headers,
+      );
+
+      if (res.headers[HttpHeaders.contentTypeHeader] == 'application/json') {
+        return const JsonDecoder().convert(res.body);
+      }
+    } on SocketException {
+      return {'error': 'NO_INTERNET'};
+    } on HttpException {
+      return {'error': 'NO_SERVICE'};
+    } on FormatException {
+      return {'error': 'INVALID_RESPONSE'};
+    } catch (e) {
+      return {'error': 'UNKNOWN'};
     }
 
-    return {};
+    return {'error': 'UNKNOWN'};
   }
 
   static Future<Map<String, dynamic>> post(String url,
       {Map<String, dynamic>? body}) async {
-    http.Response res = await http.post(
-      Uri.parse('$baseUrl$url'),
-      body: const JsonEncoder().convert(body),
-      headers: Http.headers,
-    );
+    try {
+      http.Response res = await http.post(
+        Uri.parse('$baseUrl$url'),
+        body: const JsonEncoder().convert(body),
+        headers: Http.headers,
+      );
 
-    if (res.headers[HttpHeaders.contentTypeHeader] == 'application/json') {
-      return const JsonDecoder().convert(res.body);
+      if (res.headers[HttpHeaders.contentTypeHeader] == 'application/json') {
+        return const JsonDecoder().convert(res.body);
+      }
+    } on SocketException {
+      return {'error': 'NO_INTERNET'};
+    } on HttpException {
+      return {'error': 'NO_SERVICE'};
+    } on FormatException {
+      return {'error': 'INVALID_RESPONSE'};
+    } catch (e) {
+      return {'error': 'UNKNOWN'};
     }
 
-    return {};
+    return {'error': 'UNKNOWN'};
+  }
+
+  static Future<Map<String, dynamic>> put(String url,
+      {Map<String, dynamic>? body, List<http.MultipartFile>? files}) async {
+    final uri = Uri.parse('$baseUrl$url');
+
+    if (files != null) {
+      final req = http.MultipartRequest('PUT', uri);
+
+      req.files.addAll(files);
+      req.headers.addAll(Http.headers);
+
+      body?.forEach((key, value) {
+        req.fields[key] = value.toString();
+      });
+
+      http.StreamedResponse sres = await req.send();
+      http.Response res = await http.Response.fromStream(sres);
+
+      if (res.headers[HttpHeaders.contentTypeHeader] == 'application/json') {
+        return const JsonDecoder().convert(res.body);
+      }
+
+      return {'error': 'UNKNOWN ${res.statusCode}', 'body': res.body};
+    }
+
+    try {
+      http.Response res = await http.put(
+        uri,
+        body: const JsonEncoder().convert(body),
+        headers: Http.headers,
+      );
+
+      if (res.headers[HttpHeaders.contentTypeHeader] == 'application/json') {
+        return const JsonDecoder().convert(res.body);
+      }
+    } on SocketException {
+      return {'error': 'NO_INTERNET'};
+    } on HttpException {
+      return {'error': 'NO_SERVICE'};
+    } on FormatException {
+      return {'error': 'INVALID_RESPONSE'};
+    } catch (e) {
+      return {'error': 'UNKNOWN'};
+    }
+
+    return {'error': 'UNKNOWN'};
   }
 }

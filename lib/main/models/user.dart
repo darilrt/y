@@ -1,3 +1,5 @@
+import 'package:y/messaging/models/chat.dart';
+
 import '../constants/user.dart';
 
 class User {
@@ -12,7 +14,7 @@ class User {
   final DateTime lastSignInTime;
   final DateTime creationTime;
   final DateTime lastRefreshTime;
-  final List<String> chats;
+  final List<Chat> chats;
   final List<User> friends;
 
   User({
@@ -32,15 +34,15 @@ class User {
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
-    List<String> chats = [];
+    List<Chat> chats = [];
     List<User> friends = [];
 
     if (json['chats'] != null) {
-      final data = json["chats"] as Map<Object?, dynamic>;
+      final data = json["chats"] as List<dynamic>;
 
-      data.forEach((key, value) {
-        chats.add(value as String);
-      });
+      for (var value in data) {
+        chats.add(Chat.fromJson(value));
+      }
     }
 
     if (json['friends'] != null) {

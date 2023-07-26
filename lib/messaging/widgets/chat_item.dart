@@ -9,7 +9,7 @@ import '../models/chat.dart';
 class ChatItem extends StatelessWidget {
   const ChatItem({Key? key, required this.info}) : super(key: key);
 
-  final ChatInfo info;
+  final Chat info;
 
   @override
   Widget build(BuildContext context) {

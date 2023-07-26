@@ -1,5 +1,6 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:y/utils/http.dart';
+import 'package:http/http.dart' as http;
 import '../models/user.dart';
 
 const storage = FlutterSecureStorage();
@@ -27,7 +28,7 @@ class UserRepo {
     }
 
     Http.setBearerToken(res['token'] as String);
-    final Map<String, dynamic> data = (await Http.get('/users/me'));
+    final Map<String, dynamic> data = await Http.get('/users/me');
 
     storage.write(key: 'auth_token', value: res['token']);
 
@@ -75,7 +76,7 @@ class UserRepo {
     String? token = await storage.read(key: 'auth_token');
     if (token != null) {
       Http.setBearerToken(token);
-      final Map<String, dynamic> data = (await Http.get('/users/me'));
+      final Map<String, dynamic> data = await Http.get('/users/me');
 
       if (data['error'] != null) {
         return false;
@@ -111,11 +112,35 @@ class UserRepo {
     });
   }
 
-  static Stream<List<int>> getFriendsStream(int id) {
-    return const Stream<List<int>>.empty();
+  static Future<void> update(
+      {String? name, String? username, String? avatar, String? cover}) async {
+    Map<String, dynamic> data = await Http.put('/users/me', body: {
+      'name': name,
+      'username': username,
+    });
+
+    if (data['error'] != null) {
+      throw Exception(data['error']);
+    }
+
+    final files = <http.MultipartFile>[];
+
+    if (avatar != null) {
+      files.add(await http.MultipartFile.fromPath('avatar', avatar));
+    }
+
+    if (cover != null) {
+      files.add(await http.MultipartFile.fromPath('cover', cover));
+    }
+
+    if (avatar != null || cover != null) {
+      data = await Http.put('/users/me', files: files);
+    }
+
+    if (data['error'] != null) {
+      throw Exception(data['error']);
+    }
+
+    _currentUser = User.fromJson(data);
   }
-
-  static void updateAvatar(String value) {}
-
-  static void updateUser({required String name, required String username}) {}
 }

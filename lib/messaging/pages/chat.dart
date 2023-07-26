@@ -1,3 +1,4 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:y/main/models/user.dart';
 import 'package:y/main/repo/user_repo.dart';
@@ -12,7 +13,7 @@ import '../widgets/chat_app_bar.dart';
 class ChatPage extends StatefulWidget {
   const ChatPage({Key? key, required this.info}) : super(key: key);
 
-  final ChatInfo info;
+  final Chat info;
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -27,7 +28,7 @@ class _ChatPageState extends State<ChatPage> {
     }
 
     MessageRepo.sendMessage(
-      chatId: widget.info.id,
+      chatId: widget.info.uid,
       message: _messageController.text,
     );
 
@@ -63,7 +64,7 @@ class _ChatPageState extends State<ChatPage> {
               children: [
                 Expanded(
                   child: StreamBuilder<List<Message?>>(
-                    stream: MessageRepo.getMessagesStream(widget.info.id),
+                    stream: MessageRepo.getMessagesStream(widget.info.uid),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         List<Message?> messages = snapshot.data ?? <Message?>[];
@@ -131,42 +132,43 @@ class _ChatPageState extends State<ChatPage> {
                 ),
               ],
             ),
-            StreamBuilder<ChatInfo?>(
-              stream: ChatRepo.getChatInfoStream(widget.info.id),
+            StreamBuilder<DatabaseEvent>(
+              stream: ChatRepo.getChatInfoStream(widget.info.uid),
               builder: (context, snapshot) {
                 if (snapshot.hasData && snapshot.data != null) {
-                  ChatInfo info = snapshot.data!;
+                  // Chat info = snapshot.data!;
 
-                  if (info.isGroup) {
-                    return ChatAppBar(
-                      name: info.name,
-                      avatar: info.avatar,
-                    );
-                  }
+                  // if (info.isGroup) {
+                  //   return ChatAppBar(
+                  //     name: info.name,
+                  //     avatar: info.avatar,
+                  //   );
+                  // }
 
-                  final otherUserId = info.users.firstWhere(
-                    (element) => element != me.id,
-                  );
+                  // final otherUserId = info.users.firstWhere(
+                  //   (element) => element != me.id,
+                  // );
 
-                  return StreamBuilder<User?>(
-                    stream: UserRepo.getUserStream(123),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData && snapshot.data != null) {
-                        User user = snapshot.data!;
+                  // return StreamBuilder<User?>(
+                  //   stream: UserRepo.getUserStream(123),
+                  //   builder: (context, snapshot) {
+                  //     if (snapshot.hasData && snapshot.data != null) {
+                  //       User user = snapshot.data!;
 
-                        return ChatAppBar(
-                          name: user.name,
-                          avatar: user.avatar,
-                        );
-                      } else {
-                        return const ChatAppBar(
-                          name: '',
-                          avatar:
-                              'https://firebasestorage.googleapis.com/v0/b/daril-y.appspot.com/o/profiles%2Fdefault.jpg?alt=media&token=4e23040e-5e3f-4972-bd34-5d23acc02f27',
-                        );
-                      }
-                    },
-                  );
+                  //       return ChatAppBar(
+                  //         name: user.name,
+                  //         avatar: user.avatar,
+                  //       );
+                  //     } else {
+                  //       return const ChatAppBar(
+                  //         name: '',
+                  //         avatar:
+                  //             'https://firebasestorage.googleapis.com/v0/b/daril-y.appspot.com/o/profiles%2Fdefault.jpg?alt=media&token=4e23040e-5e3f-4972-bd34-5d23acc02f27',
+                  //       );
+                  //     }
+                  //   },
+                  // );
+                  return const Text("");
                 } else {
                   return const ChatAppBar(
                     name: '',

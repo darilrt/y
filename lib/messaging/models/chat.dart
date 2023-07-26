@@ -1,7 +1,9 @@
+import 'package:y/main/models/user.dart';
 import 'package:y/messaging/models/message.dart';
 
-class ChatInfo {
-  final String id;
+class Chat {
+  final int id;
+  final String uid;
   final String name;
   final String avatar;
   final String lastMessage;
@@ -10,10 +12,11 @@ class ChatInfo {
   final bool isGroup;
   final int messagesCount;
   final List<Message> messages;
-  final List<String> users;
+  final List<User> users;
 
-  const ChatInfo({
+  const Chat({
     required this.id,
+    required this.uid,
     required this.name,
     required this.avatar,
     required this.lastMessage,
@@ -22,24 +25,24 @@ class ChatInfo {
     required this.messages,
     this.isGroup = false,
     this.messagesCount = 0,
-    this.users = const <String>[],
+    this.users = const <User>[],
   });
 
-  factory ChatInfo.fromJson(Map<String, dynamic> json) {
+  factory Chat.fromJson(Map<String, dynamic> json) {
     final List<Message> messages = json['messages'] != null
         ? Message.fromJsonList(json['messages'])
         : <Message>[];
 
     final Message? lastMessage = messages.isNotEmpty ? messages.first : null;
 
-    List<String> users = [];
-
-    json['users'].forEach((key, value) {
-      users.add(value as String);
+    List<User> users = [];
+    json['users'].forEach((value) {
+      users.add(User.fromJson(value));
     });
 
-    return ChatInfo(
+    return Chat(
       id: json['id'],
+      uid: json['uid'],
       name: json['name'] ?? '',
       avatar: json['avatar'] ?? 'https://i.pravatar.cc/240',
       lastMessage: lastMessage != null ? lastMessage.message : '',
@@ -48,7 +51,7 @@ class ChatInfo {
       isOnline: json['isOnline'] ?? false,
       messages: messages,
       messagesCount: json['messagesCount'] ?? 0,
-      isGroup: json['users'] != null && json['users'].length > 2,
+      isGroup: json['isGroup'],
       users: users,
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:y/main/repo/user_repo.dart';
 import 'package:y/utils/loading.dart';
+import 'package:y/utils/login.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({Key? key}) : super(key: key);
@@ -24,7 +25,9 @@ class LoginPage extends StatelessWidget {
       Loading.hideLoading(context);
 
       if (value != null) {
-        Navigator.pushReplacementNamed(context, '/home');
+        Login.checkLogin(context, onLogged: () {
+          Navigator.pushReplacementNamed(context, '/home');
+        });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

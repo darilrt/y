@@ -62,7 +62,18 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
+  fonts:
+    - family: ComicNeue
+      fonts:
+        - asset: fonts/ComicNeue-Regular.ttf
+        - asset: fonts/ComicNeue-Bold.ttf
+          weight: 700
+        - asset: fonts/ComicNeue-Italic.ttf
+          style: italic
+        - asset: fonts/ComicNeue-BoldItalic.ttf
+          weight: 700
+          style: italic
+    
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

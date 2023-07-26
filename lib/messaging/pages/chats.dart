@@ -1,7 +1,12 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:y/main/models/user.dart';
+import 'package:y/main/repo/user_repo.dart';
+import 'package:y/messaging/pages/friends_to_chat.dart';
 import 'package:y/messaging/repo/chat_repo.dart';
 import 'package:y/messaging/widgets/chat_item.dart';
+import 'package:y/utils/login.dart';
+import 'package:y/utils/route.dart';
 
 import '../models/chat.dart';
 
@@ -10,6 +15,10 @@ class ChatsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Login.checkLogin(context);
+
+    User me = UserRepo.currentUser!;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -17,50 +26,52 @@ class ChatsPage extends StatelessWidget {
         title: const Text('Messaging'),
         actions: [
           IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.search),
+            onPressed: () {
+              Navigator.push(
+                context,
+                YPageRoute(
+                  page: const FriendsToChat(),
+                  orientation: AnimationOrientation.topToBottom,
+                ),
+              );
+            },
+            icon: const Icon(Icons.add),
           ),
           const SizedBox(
             width: 10,
           ),
         ],
       ),
-      body: StreamBuilder<DatabaseEvent>(
-        stream: ChatRepo.getChatsStream(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data!.snapshot.value != null) {
-            final Map<String, dynamic> data =
-                Map<String, dynamic>.from(snapshot.data!.snapshot.value as Map);
-
-            List<String> chats = [];
-
-            data.forEach((key, value) {
-              chats.add(value as String);
-            });
-
-            return ListView.builder(
-              itemCount: chats.length,
+      body: me.chats.isNotEmpty
+          ? ListView.builder(
+              itemCount: me.chats.length,
               itemBuilder: (context, index) {
-                String chatId = chats[index];
+                String chatId = me.chats[index].uid;
 
-                return StreamBuilder<ChatInfo?>(
+                return StreamBuilder<DatabaseEvent>(
                   stream: ChatRepo.getChatInfoStream(chatId),
-                  builder: (context, chatInfo) {
+                  builder: (context, snapshot) {
                     if (snapshot.hasData) {
-                      return chatInfo.data != null
-                          ? ChatItem(
-                              info: chatInfo.data!,
-                            )
-                          : const SizedBox();
+                      final data = snapshot.data!.snapshot.value
+                          as Map<Object?, dynamic>;
+
+                      Map<String, dynamic> chatInfo = {};
+
+                      data.forEach((key, value) {
+                        chatInfo[key.toString()] = value;
+                      });
+
+                      String name = chatInfo["name"] ?? 'No name';
+
+                      return Text(name);
                     } else {
                       return const SizedBox();
                     }
                   },
                 );
               },
-            );
-          } else {
-            return const Center(
+            )
+          : const Center(
               child: Text(
                 'No chats yet :\'c',
                 style: TextStyle(
@@ -68,10 +79,7 @@ class ChatsPage extends StatelessWidget {
                   color: Color.fromARGB(255, 99, 99, 99),
                 ),
               ),
-            );
-          }
-        },
-      ),
+            ),
     );
   }
 }

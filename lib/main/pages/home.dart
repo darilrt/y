@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:y/messaging/pages/chats.dart';
+import 'package:y/utils/login.dart';
 import '../widgets/navbar.dart';
 import 'profile.dart';
 
@@ -15,14 +16,13 @@ class _HomePageState extends State<HomePage> {
 
   final List<IconData> icons = [
     Icons.person,
-    // Icons.search,
-    // Icons.apps,
-    // Icons.notificatiwwons,
+    Icons.search,
+    Icons.apps,
+    Icons.notifications,
     Icons.message,
   ];
 
   Widget _buildBody() {
-    // TODO: Implement other pages
     switch (icons[_selectedTab]) {
       case Icons.message:
         return const ChatsPage();
@@ -50,6 +50,8 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _selectedTab = index;
     });
+
+    Login.checkLogin(context);
   }
 
   @override

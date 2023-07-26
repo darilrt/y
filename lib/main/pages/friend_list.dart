@@ -11,6 +11,8 @@ class FriendListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     User me = UserRepo.currentUser!;
 
+    List<User> friends = me.friends;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -26,58 +28,26 @@ class FriendListPage extends StatelessWidget {
           ),
         ],
       ),
-      body: StreamBuilder<List<int>>(
-        stream: UserRepo.getFriendsStream(me.id),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            List<int> friends = snapshot.data!;
-
-            if (friends.isEmpty) {
-              return const Center(
-                child: Text(
-                  'No friends? :\'c\nAdd some!',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Color.fromARGB(255, 99, 99, 99),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              );
-            }
-
-            return ListView.builder(
-              itemCount: friends.length,
-              itemBuilder: (context, index) {
-                return StreamBuilder<User?>(
-                  stream: UserRepo.getUserStream(friends[index]),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      User user = snapshot.data!;
-
-                      return FriendListItem(
-                        onTap: () {},
-                        user: user,
-                      );
-                    } else {
-                      return const SizedBox();
-                    }
-                  },
-                );
-              },
-            );
-          } else {
-            return const Center(
+      body: friends.isEmpty
+          ? const Center(
               child: Text(
-                'No chats yet :\'c',
+                'No friends? :\'c\nAdd some!',
                 style: TextStyle(
                   fontSize: 16,
                   color: Color.fromARGB(255, 99, 99, 99),
                 ),
+                textAlign: TextAlign.center,
               ),
-            );
-          }
-        },
-      ),
+            )
+          : ListView.builder(
+              itemCount: friends.length,
+              itemBuilder: (context, index) {
+                return FriendListItem(
+                  onTap: () {},
+                  user: friends[index],
+                );
+              },
+            ),
     );
   }
 }

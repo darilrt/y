@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:y/utils/login.dart';
 import 'package:y/utils/route.dart';
 import '../repo/user_repo.dart';
 import 'settings/edit_profile.dart';
@@ -13,6 +14,8 @@ class SettingsPage extends StatelessWidget {
   }
 
   void _onEditProfile(BuildContext context) {
+    Login.checkLogin(context);
+
     Navigator.of(context).push(YPageRoute(
       page: const EditProfilePage(),
     ));
