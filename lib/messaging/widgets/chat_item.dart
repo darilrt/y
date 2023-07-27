@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:y/main/models/user.dart';
 import 'package:y/main/repo/user_repo.dart';
 import 'package:y/messaging/pages/chat.dart';
 import 'package:y/utils/route.dart';
@@ -138,100 +137,86 @@ class ChatItem extends StatelessWidget {
 
     if (info.lastMessage.length > 30) messageWrapped += '...';
 
-    final otherUserId =
-        info.users.firstWhere((element) => element != UserRepo.currentUser!.id);
+    final otherUser = info.users
+        .firstWhere((element) => element.id != UserRepo.currentUser!.id);
 
-    return StreamBuilder<User?>(
-        stream: UserRepo.getUserStream(1),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const SizedBox.shrink();
-          }
-
-          User otherUser = snapshot.data!;
-
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Transform.translate(
-                offset: const Offset(0, 0),
-                child: CircleAvatar(
-                  radius: 25,
-                  backgroundImage: NetworkImage(otherUser.avatar),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        CircleAvatar(
+          radius: 25,
+          backgroundImage: NetworkImage(otherUser.avatar),
+        ),
+        info.isOnline
+            ? Transform.translate(
+                offset: const Offset(-13, 13),
+                child: const Icon(
+                  Icons.circle,
+                  size: 15,
+                  color: Colors.green,
+                ),
+              )
+            : const SizedBox(
+                width: 15,
+              ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              otherUser.name,
+              style: const TextStyle(
+                fontSize: 20,
+              ),
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            Text(
+              messageWrapped,
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.grey,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+        const Spacer(),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Container(
+              padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+              decoration: BoxDecoration(
+                color:
+                    info.messagesCount > 0 ? Colors.blue : Colors.transparent,
+                borderRadius: BorderRadius.circular(100),
+              ),
+              child: Text(
+                info.messagesCount.toString(),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: info.messagesCount > 0
+                      ? Colors.white
+                      : Colors.transparent,
                 ),
               ),
-              info.isOnline
-                  ? Transform.translate(
-                      offset: const Offset(-13, 13),
-                      child: const Icon(
-                        Icons.circle,
-                        size: 15,
-                        color: Colors.green,
-                      ),
-                    )
-                  : const SizedBox(
-                      width: 15,
-                    ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    otherUser.name,
-                    style: const TextStyle(
-                      fontSize: 20,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    messageWrapped,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            Text(
+              lastMessageTime(info.lastMessageTime),
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.grey,
               ),
-              const Spacer(),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                    decoration: BoxDecoration(
-                      color: info.messagesCount > 0
-                          ? Colors.blue
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                    child: Text(
-                      info.messagesCount.toString(),
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: info.messagesCount > 0
-                            ? Colors.white
-                            : Colors.transparent,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    lastMessageTime(info.lastMessageTime),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          );
-        });
+            ),
+          ],
+        ),
+      ],
+    );
   }
 }

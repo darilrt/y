@@ -1,4 +1,3 @@
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:y/main/models/user.dart';
 import 'package:y/main/repo/user_repo.dart';
@@ -7,7 +6,6 @@ import 'package:y/messaging/models/message.dart';
 import 'package:y/messaging/repo/message_repo.dart';
 import 'package:y/messaging/widgets/chat_message.dart';
 
-import '../repo/chat_repo.dart';
 import '../widgets/chat_app_bar.dart';
 
 class ChatPage extends StatefulWidget {
@@ -43,6 +41,18 @@ class _ChatPageState extends State<ChatPage> {
         'https://papers.co/wallpaper/papers.co-vy45-digital-dark-square-color-bw-pattern-background-41-iphone-wallpaper.jpg';
 
     User me = UserRepo.currentUser!;
+
+    String name = widget.info.name;
+    String avatar = widget.info.avatar;
+
+    if (!widget.info.isGroup) {
+      User otherUser = widget.info.users.firstWhere(
+        (element) => element.id != me.id,
+      );
+
+      name = otherUser.name;
+      avatar = otherUser.avatar;
+    }
 
     return Scaffold(
       body: Container(
@@ -132,51 +142,9 @@ class _ChatPageState extends State<ChatPage> {
                 ),
               ],
             ),
-            StreamBuilder<DatabaseEvent>(
-              stream: ChatRepo.getChatInfoStream(widget.info.uid),
-              builder: (context, snapshot) {
-                if (snapshot.hasData && snapshot.data != null) {
-                  // Chat info = snapshot.data!;
-
-                  // if (info.isGroup) {
-                  //   return ChatAppBar(
-                  //     name: info.name,
-                  //     avatar: info.avatar,
-                  //   );
-                  // }
-
-                  // final otherUserId = info.users.firstWhere(
-                  //   (element) => element != me.id,
-                  // );
-
-                  // return StreamBuilder<User?>(
-                  //   stream: UserRepo.getUserStream(123),
-                  //   builder: (context, snapshot) {
-                  //     if (snapshot.hasData && snapshot.data != null) {
-                  //       User user = snapshot.data!;
-
-                  //       return ChatAppBar(
-                  //         name: user.name,
-                  //         avatar: user.avatar,
-                  //       );
-                  //     } else {
-                  //       return const ChatAppBar(
-                  //         name: '',
-                  //         avatar:
-                  //             'https://firebasestorage.googleapis.com/v0/b/daril-y.appspot.com/o/profiles%2Fdefault.jpg?alt=media&token=4e23040e-5e3f-4972-bd34-5d23acc02f27',
-                  //       );
-                  //     }
-                  //   },
-                  // );
-                  return const Text("");
-                } else {
-                  return const ChatAppBar(
-                    name: '',
-                    avatar:
-                        'https://firebasestorage.googleapis.com/v0/b/daril-y.appspot.com/o/profiles%2Fdefault.jpg?alt=media&token=4e23040e-5e3f-4972-bd34-5d23acc02f27',
-                  );
-                }
-              },
+            ChatAppBar(
+              name: name,
+              avatar: avatar,
             ),
           ],
         ),

@@ -28,7 +28,9 @@ class _HomePageState extends State<HomePage> {
         return const ChatsPage();
 
       case Icons.search:
-        return const Text("Search");
+        return const Center(
+          child: Text('Search'),
+        );
 
       case Icons.apps:
         return const Text("Apps");
