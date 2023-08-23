@@ -143,4 +143,18 @@ class UserRepo {
 
     _currentUser = User.fromJson(data);
   }
+
+  static Future<List<User>> search(String query) async {
+    final Map<String, dynamic> data = await Http.get('/users/search', params: {
+      'q': query,
+    });
+
+    if (data['error'] != null) {
+      throw Exception(data['error']);
+    }
+
+    return (data['users'] as List<dynamic>)
+        .map((e) => User.fromJson(e))
+        .toList();
+  }
 }
