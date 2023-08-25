@@ -1,30 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:y/main/repo/user_repo.dart';
+import 'package:y/messaging/models/message.dart';
 import 'package:y/messaging/pages/chat.dart';
+import 'package:y/messaging/repo/message_repo.dart';
 import 'package:y/utils/route.dart';
 
 import '../models/chat.dart';
 
-class ChatItem extends StatelessWidget {
+class ChatItem extends StatefulWidget {
   const ChatItem({Key? key, required this.info}) : super(key: key);
 
   final Chat info;
+
+  @override
+  State<ChatItem> createState() => _ChatItemState();
+}
+
+class _ChatItemState extends State<ChatItem> {
+  Message? lastMessage;
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       onTap: () {
         Navigator.of(context).push(YPageRoute(
-          page: ChatPage(info: info),
+          page: ChatPage(info: widget.info),
         ));
       },
-      title: info.isGroup ? buildGroupChat(context) : buildUserChat(context),
+      title: widget.info.isGroup
+          ? buildGroupChat(context)
+          : buildUserChat(context),
     );
   }
 
-  String lastMessageTime(DateTime lastMessageTime) {
+  String lastMessageTime() {
+    if (lastMessage == null) {
+      return '';
+    }
+
     DateTime now = DateTime.now();
-    Duration difference = now.difference(lastMessageTime);
+    Duration difference = now.difference(lastMessage!.createdAt);
 
     if (difference.inDays > 0) {
       return '${difference.inDays}d';
@@ -38,11 +53,11 @@ class ChatItem extends StatelessWidget {
   }
 
   buildGroupChat(BuildContext context) {
-    String messageWrapped = info.lastMessage.length > 30
-        ? info.lastMessage.substring(0, 25)
-        : info.lastMessage;
-
-    if (info.lastMessage.length > 30) messageWrapped += '...';
+    String messageWrapped = lastMessage != null
+        ? lastMessage!.message.length > 30
+            ? '${lastMessage!.message.substring(0, 25)}...'
+            : lastMessage!.message
+        : '';
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -51,7 +66,7 @@ class ChatItem extends StatelessWidget {
           offset: const Offset(0, 0),
           child: CircleAvatar(
             radius: 25,
-            backgroundImage: NetworkImage(info.avatar),
+            backgroundImage: NetworkImage(widget.info.avatar),
           ),
         ),
         const SizedBox(
@@ -72,7 +87,7 @@ class ChatItem extends StatelessWidget {
                   width: 5,
                 ),
                 Text(
-                  info.name,
+                  widget.info.name,
                   style: const TextStyle(
                     fontSize: 20,
                   ),
@@ -100,15 +115,16 @@ class ChatItem extends StatelessWidget {
             Container(
               padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
               decoration: BoxDecoration(
-                color:
-                    info.messagesCount > 0 ? Colors.blue : Colors.transparent,
+                color: widget.info.messagesCount > 0
+                    ? Colors.blue
+                    : Colors.transparent,
                 borderRadius: BorderRadius.circular(100),
               ),
               child: Text(
-                info.messagesCount.toString(),
+                widget.info.messagesCount.toString(),
                 style: TextStyle(
                   fontSize: 16,
-                  color: info.messagesCount > 0
+                  color: widget.info.messagesCount > 0
                       ? Colors.white
                       : Colors.transparent,
                 ),
@@ -118,7 +134,7 @@ class ChatItem extends StatelessWidget {
               height: 5,
             ),
             Text(
-              lastMessageTime(info.lastMessageTime),
+              lastMessageTime(),
               style: const TextStyle(
                 fontSize: 16,
                 color: Colors.grey,
@@ -131,13 +147,13 @@ class ChatItem extends StatelessWidget {
   }
 
   buildUserChat(BuildContext context) {
-    String messageWrapped = info.lastMessage.length > 30
-        ? info.lastMessage.substring(0, 25)
-        : info.lastMessage;
+    String messageWrapped = lastMessage != null
+        ? lastMessage!.message.length > 30
+            ? '${lastMessage!.message.substring(0, 25)}...'
+            : lastMessage!.message
+        : '';
 
-    if (info.lastMessage.length > 30) messageWrapped += '...';
-
-    final otherUser = info.users
+    final otherUser = widget.info.users
         .firstWhere((element) => element.id != UserRepo.currentUser!.id);
 
     return Row(
@@ -147,7 +163,7 @@ class ChatItem extends StatelessWidget {
           radius: 25,
           backgroundImage: NetworkImage(otherUser.avatar),
         ),
-        info.isOnline
+        false
             ? Transform.translate(
                 offset: const Offset(-13, 13),
                 child: const Icon(
@@ -190,15 +206,16 @@ class ChatItem extends StatelessWidget {
             Container(
               padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
               decoration: BoxDecoration(
-                color:
-                    info.messagesCount > 0 ? Colors.blue : Colors.transparent,
+                color: widget.info.messagesCount > 0
+                    ? Colors.blue
+                    : Colors.transparent,
                 borderRadius: BorderRadius.circular(100),
               ),
               child: Text(
-                info.messagesCount.toString(),
+                widget.info.messagesCount.toString(),
                 style: TextStyle(
                   fontSize: 16,
-                  color: info.messagesCount > 0
+                  color: widget.info.messagesCount > 0
                       ? Colors.white
                       : Colors.transparent,
                 ),
@@ -208,7 +225,7 @@ class ChatItem extends StatelessWidget {
               height: 5,
             ),
             Text(
-              lastMessageTime(info.lastMessageTime),
+              lastMessageTime(),
               style: const TextStyle(
                 fontSize: 16,
                 color: Colors.grey,
@@ -218,5 +235,28 @@ class ChatItem extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  void getLastMessage() {
+    MessageRepo.getMessagesStream(widget.info.uid)
+        .listen((List<Message> event) {
+      if (event.isNotEmpty) {
+        setState(() {
+          lastMessage = event.first;
+        });
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    getLastMessage();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }

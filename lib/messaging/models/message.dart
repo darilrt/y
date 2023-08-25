@@ -12,11 +12,24 @@ class Message {
   });
 
   factory Message.fromJson(Map<String, dynamic> json) {
+    int senderId = 0;
+
+    if (json.containsKey('senderId') && json['senderId'].runtimeType == int) {
+      senderId = json['senderId'];
+    }
+
+    DateTime createdAt = DateTime.now();
+
+    if (json.containsKey('createdAt') &&
+        json['createdAt'].runtimeType == String) {
+      createdAt = DateTime.parse(json['createdAt']).toLocal();
+    }
+
     return Message(
       id: json['id'],
       message: json['message'],
-      senderId: json['senderId'],
-      createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']),
+      senderId: senderId,
+      createdAt: createdAt,
     );
   }
 

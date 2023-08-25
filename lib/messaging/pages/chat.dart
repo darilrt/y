@@ -26,7 +26,7 @@ class _ChatPageState extends State<ChatPage> {
     }
 
     MessageRepo.sendMessage(
-      chatId: widget.info.uid,
+      chatId: widget.info.id,
       message: _messageController.text,
     );
 

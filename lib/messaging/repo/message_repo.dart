@@ -1,23 +1,18 @@
 import 'package:firebase_database/firebase_database.dart';
-import 'package:y/main/models/user.dart';
-import 'package:y/main/repo/user_repo.dart';
 import 'package:y/messaging/models/message.dart';
+import 'package:y/utils/http.dart';
 
 class MessageRepo {
-  static void sendMessage({
-    required String chatId,
+  static Future<void> sendMessage({
+    required int chatId,
     required String message,
-  }) {
-    User me = UserRepo.currentUser!;
-
-    final DatabaseReference messagesRef =
-        FirebaseDatabase.instance.ref('chats/$chatId/messages');
-
-    messagesRef.push().set({
-      'message': message,
-      'senderId': me.id,
-      'createdAt': DateTime.now().millisecondsSinceEpoch,
-    });
+  }) async {
+    await Http.post(
+      '/chats/$chatId/messages',
+      body: {
+        'message': message,
+      },
+    );
   }
 
   static Stream<List<Message>> getMessagesStream(String id) {
