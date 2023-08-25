@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:y/main/pages/search.dart';
 import 'package:y/messaging/pages/chats.dart';
 import 'package:y/utils/login.dart';
 import '../widgets/navbar.dart';
-import 'profile.dart';
+import 'my_profile.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -28,9 +29,7 @@ class _HomePageState extends State<HomePage> {
         return const ChatsPage();
 
       case Icons.search:
-        return const Center(
-          child: Text('Search'),
-        );
+        return SearchPage();
 
       case Icons.apps:
         return const Text("Apps");
@@ -39,7 +38,7 @@ class _HomePageState extends State<HomePage> {
         return const Text("Notifications");
 
       case Icons.person:
-        return const ProfilePage();
+        return const MyProfilePage();
 
       default:
         return const Center(

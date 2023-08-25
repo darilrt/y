@@ -1,62 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:y/main/pages/friend_list.dart';
+import 'package:y/utils/login.dart';
 import 'package:y/utils/route.dart';
-
 import '../models/user.dart';
+import '../pages/settings.dart';
 import '../repo/user_repo.dart';
 
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({
-    Key? key,
-    required this.user,
-  }) : super(key: key);
+class MyProfilePage extends StatelessWidget {
+  const MyProfilePage({Key? key}) : super(key: key);
 
-  final User user;
-
-  @override
-  State<ProfilePage> createState() => _ProfilePageState();
-}
-
-class _ProfilePageState extends State<ProfilePage> {
-  bool _isFriend = false;
-
-  @override
-  void initState() {
-    super.initState();
-
-    for (var friend in widget.user.friends) {
-      if (friend.id == UserRepo.currentUser!.id) {
-        setState(() {
-          _isFriend = true;
-        });
-      }
-    }
-  }
-
-  void _requestFriend() {
-    setState(() {
-      _isFriend = true;
-    });
-  }
-
-  void _removeFriend() {
-    setState(() {
-      _isFriend = false;
-    });
-  }
-
-  String _getFriendCount(int length) {
-    if (length < 1000) {
-      return length.toString();
-    } else if (length < 1000000) {
-      return '${(length / 1000).toStringAsFixed(1)}K';
-    } else {
-      return '${(length / 1000000).toStringAsFixed(1)}M';
-    }
-  }
-
-  Widget _buildBanner(BuildContext context) {
-    User user = widget.user;
+  Widget buildBanner(BuildContext context) {
+    User user = UserRepo.currentUser!;
 
     return Column(
       children: [
@@ -129,6 +83,9 @@ class _ProfilePageState extends State<ProfilePage> {
             mainAxisSize: MainAxisSize.max,
             children: [
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(300, 40),
+                ),
                 onPressed: () {
                   Navigator.of(context).push(
                     YPageRoute(
@@ -137,41 +94,12 @@ class _ProfilePageState extends State<ProfilePage> {
                   );
                 },
                 child: Text(
-                  'Friends (${_getFriendCount(user.friends.length)})',
+                  'Friends (${getFriendCount(user.friends.length)})',
                   style: const TextStyle(
                     fontSize: 16,
                   ),
                 ),
               ),
-              const SizedBox(
-                width: 10,
-              ),
-              if (!_isFriend)
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(40, 40),
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                  ),
-                  onPressed: _requestFriend,
-                  child: const Icon(
-                    Icons.person_add,
-                    color: Colors.white,
-                  ),
-                ),
-              if (_isFriend)
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(40, 40),
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                  ),
-                  onPressed: _removeFriend,
-                  child: const Icon(
-                    Icons.person_remove,
-                    color: Colors.white,
-                  ),
-                ),
             ],
           ),
         ),
@@ -185,19 +113,42 @@ class _ProfilePageState extends State<ProfilePage> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         shadowColor: Colors.transparent,
-        title: Text(widget.user.name),
+        title: const Text(
+          'Profile',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         actions: [
           IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.more_vert),
+            onPressed: () {
+              Navigator.of(context).push(
+                YPageRoute(
+                  page: const SettingsPage(),
+                ),
+              );
+
+              Login.checkLogin(context);
+            },
+            icon: const Icon(Icons.more_vert_rounded),
+          ),
+          const SizedBox(
+            width: 10,
           ),
         ],
       ),
-      body: ListView(
-        children: [
-          _buildBanner(context),
-        ],
-      ),
+      body: buildBanner(context),
     );
+  }
+
+  String getFriendCount(int length) {
+    if (length < 1000) {
+      return length.toString();
+    } else if (length < 1000000) {
+      return '${(length / 1000).toStringAsFixed(1)}K';
+    } else {
+      return '${(length / 1000000).toStringAsFixed(1)}M';
+    }
   }
 }
