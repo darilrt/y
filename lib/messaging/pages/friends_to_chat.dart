@@ -7,7 +7,12 @@ import 'package:y/utils/login.dart';
 import 'package:y/utils/route.dart';
 
 class FriendsToChat extends StatelessWidget {
-  const FriendsToChat({Key? key}) : super(key: key);
+  const FriendsToChat({
+    Key? key,
+    required this.onChatCreated,
+  }) : super(key: key);
+
+  final Function onChatCreated;
 
   void _onTap(BuildContext context, User user) {
     MessageRepo.getChatByUser(user.id).then((chat) {
@@ -44,6 +49,7 @@ class FriendsToChat extends StatelessWidget {
             subtitle: Text('@${me.friends[index].username}'),
             onTap: () {
               _onTap(context, me.friends[index]);
+              onChatCreated();
             },
           );
         },

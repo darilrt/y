@@ -163,18 +163,19 @@ class _ChatItemState extends State<ChatItem> {
           radius: 25,
           backgroundImage: NetworkImage(otherUser.avatar),
         ),
-        false
-            ? Transform.translate(
-                offset: const Offset(-13, 13),
-                child: const Icon(
-                  Icons.circle,
-                  size: 15,
-                  color: Colors.green,
-                ),
-              )
-            : const SizedBox(
-                width: 15,
-              ),
+        // false
+        //     ? Transform.translate(
+        //         offset: const Offset(-13, 13),
+        //         child: const Icon(
+        //           Icons.circle,
+        //           size: 15,
+        //           color: Colors.green,
+        //         ),
+        //       )
+        //     :
+        const SizedBox(
+          width: 15,
+        ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,

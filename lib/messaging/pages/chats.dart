@@ -8,9 +8,14 @@ import 'package:y/utils/route.dart';
 
 import '../models/chat.dart';
 
-class ChatsPage extends StatelessWidget {
+class ChatsPage extends StatefulWidget {
   const ChatsPage({Key? key}) : super(key: key);
 
+  @override
+  State<ChatsPage> createState() => _ChatsPageState();
+}
+
+class _ChatsPageState extends State<ChatsPage> {
   @override
   Widget build(BuildContext context) {
     Login.checkLogin(context);
@@ -28,7 +33,11 @@ class ChatsPage extends StatelessWidget {
               Navigator.push(
                 context,
                 YPageRoute(
-                  page: const FriendsToChat(),
+                  page: FriendsToChat(
+                    onChatCreated: () {
+                      setState(() {});
+                    },
+                  ),
                   orientation: AnimationOrientation.topToBottom,
                 ),
               );
