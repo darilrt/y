@@ -27,7 +27,7 @@ class Message {
 
     return Message(
       id: json['id'],
-      message: json['message'],
+      message: json['message'] ?? '',
       senderId: senderId,
       createdAt: createdAt,
     );

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:y/main/pages/profile.dart';
 import 'package:y/main/repo/user_repo.dart';
 import 'package:y/main/widgets/friend_list_item.dart';
+import 'package:y/utils/route.dart';
 
 import '../models/user.dart';
 
@@ -43,7 +45,15 @@ class FriendListPage extends StatelessWidget {
               itemCount: friends.length,
               itemBuilder: (context, index) {
                 return FriendListItem(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(context).push(
+                      YPageRoute(
+                        page: ProfilePage(
+                          user: friends[index],
+                        ),
+                      ),
+                    );
+                  },
                   user: friends[index],
                 );
               },

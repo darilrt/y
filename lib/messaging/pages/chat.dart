@@ -74,7 +74,7 @@ class _ChatPageState extends State<ChatPage> {
               children: [
                 Expanded(
                   child: StreamBuilder<List<Message?>>(
-                    stream: MessageRepo.getMessagesStream(widget.info.uid),
+                    stream: MessageRepo.getMessagesStream(widget.info.id),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         List<Message?> messages = snapshot.data ?? <Message?>[];

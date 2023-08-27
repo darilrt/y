@@ -24,8 +24,8 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
 
-    for (var friend in widget.user.friends) {
-      if (friend.id == UserRepo.currentUser!.id) {
+    for (var friend in UserRepo.currentUser!.friends) {
+      if (friend.id == widget.user.id) {
         setState(() {
           _isFriend = true;
         });
@@ -34,8 +34,22 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _requestFriend() {
-    setState(() {
-      _isFriend = true;
+    UserRepo.requestFriend(widget.user.id).then((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Friend request sent'),
+        ),
+      );
+
+      setState(() {
+        _isFriend = true;
+      });
+    }).onError((error, stackTrace) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error.toString()),
+        ),
+      );
     });
   }
 

@@ -26,8 +26,8 @@ class Chat {
     });
 
     return Chat(
-      id: json['id'],
-      uid: json['uid'],
+      id: json['id'] ?? 0,
+      uid: json['uid'] ?? '',
       name: json['name'] ?? '',
       avatar: json['avatar'] ?? 'https://i.pravatar.cc/240',
       messagesCount: json['messagesCount'] ?? 0,

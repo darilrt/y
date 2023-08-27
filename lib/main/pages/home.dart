@@ -29,7 +29,7 @@ class _HomePageState extends State<HomePage> {
         return const ChatsPage();
 
       case Icons.search:
-        return SearchPage();
+        return const SearchPage();
 
       case Icons.apps:
         return const Text("Apps");

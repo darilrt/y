@@ -1,9 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:y/main/pages/my_profile.dart';
 import 'package:y/main/pages/profile.dart';
-import 'package:y/utils/loading.dart';
 import 'package:y/utils/route.dart';
 
 import '../models/user.dart';
@@ -120,14 +118,18 @@ class _SearchPageState extends State<SearchPage> {
             width: 10,
           )
         ],
-        title: TextFormField(
-          decoration: const InputDecoration(
-            hintText: 'Search',
-          ),
-          controller: _searchController,
-          focusNode: _searchFocusNode,
-          autocorrect: false,
-          onChanged: (query) => _onSearchChanged(query, context),
+        title: Column(
+          children: [
+            TextFormField(
+              decoration: const InputDecoration(
+                hintText: 'Search',
+              ),
+              controller: _searchController,
+              focusNode: _searchFocusNode,
+              autocorrect: false,
+              onChanged: (query) => _onSearchChanged(query, context),
+            ),
+          ],
         ),
         backgroundColor: Colors.transparent,
         shadowColor: Colors.transparent,

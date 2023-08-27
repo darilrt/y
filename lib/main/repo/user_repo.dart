@@ -157,4 +157,24 @@ class UserRepo {
         .map((e) => User.fromJson(e))
         .toList();
   }
+
+  static Future<User> requestFriend(int userId) async {
+    final Map<String, dynamic> data =
+        await Http.post('/users/me/friends', body: {
+      'id': userId,
+    });
+
+    if (data['error'] != null) {
+      throw Exception(data['error']);
+    }
+
+    _currentUser = User.fromJson(data);
+    return _currentUser!;
+  }
+
+  static void updateFcmToken(String token) {
+    Http.post('/users/me/fcm', body: {
+      'token': token,
+    });
+  }
 }
