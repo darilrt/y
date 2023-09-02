@@ -38,18 +38,11 @@ class _ChatItemState extends State<ChatItem> {
       return '';
     }
 
-    DateTime now = DateTime.now();
-    Duration difference = now.difference(lastMessage!.createdAt);
+    final String hour = lastMessage!.createdAt.hour.toString().padLeft(2, '0');
+    final String minute =
+        lastMessage!.createdAt.minute.toString().padLeft(2, '0');
 
-    if (difference.inDays > 0) {
-      return '${difference.inDays}d';
-    } else if (difference.inHours > 0) {
-      return '${difference.inHours}h';
-    } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes}m';
-    } else {
-      return '${difference.inSeconds}s';
-    }
+    return '$hour:$minute';
   }
 
   buildGroupChat(BuildContext context) {

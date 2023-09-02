@@ -23,6 +23,9 @@ class Message {
     if (json.containsKey('createdAt') &&
         json['createdAt'].runtimeType == String) {
       createdAt = DateTime.parse(json['createdAt']).toLocal();
+    } else {
+      createdAt =
+          DateTime.fromMillisecondsSinceEpoch(json['createdAt']).toLocal();
     }
 
     return Message(
