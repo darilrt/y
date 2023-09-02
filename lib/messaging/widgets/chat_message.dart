@@ -73,9 +73,18 @@ class ChatMessage extends StatelessWidget {
   }
 
   Widget messageStatus() {
+    if (message.isRead) {
+      return const Icon(
+        Icons.done_all,
+        size: 15,
+        color: Colors.blue,
+      );
+    }
+
     return const Icon(
       Icons.done,
       size: 15,
+      color: Colors.grey,
     );
   }
 }

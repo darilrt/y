@@ -233,7 +233,7 @@ class _ChatItemState extends State<ChatItem> {
 
   void getLastMessage() {
     MessageRepo.getMessagesStream(widget.info.id).listen((List<Message> event) {
-      if (event.isNotEmpty) {
+      if (event.isNotEmpty && mounted) {
         setState(() {
           lastMessage = event.first;
         });

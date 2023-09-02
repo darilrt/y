@@ -3,12 +3,14 @@ class Message {
   final String message;
   final int senderId;
   final DateTime createdAt;
+  final bool isRead;
 
   Message({
     required this.id,
     required this.message,
     required this.senderId,
     required this.createdAt,
+    required this.isRead,
   });
 
   factory Message.fromJson(Map<String, dynamic> json) {
@@ -33,6 +35,7 @@ class Message {
       message: json['message'] ?? '',
       senderId: senderId,
       createdAt: createdAt,
+      isRead: json['isRead'] ?? false,
     );
   }
 

@@ -1,3 +1,5 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:y/main/pages/search.dart';
 import 'package:y/messaging/pages/chats.dart';
@@ -57,6 +59,12 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      message.data.forEach((key, value) {
+        print('$key: $value');
+      });
+    });
+
     return Scaffold(
       body: _buildBody(),
       bottomNavigationBar: NavBar(
